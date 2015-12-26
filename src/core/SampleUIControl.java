@@ -1229,13 +1229,14 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     setRate(Integer.parseInt(props.getProperty(tag  + "rate")));
     setTrem(Integer.parseInt(props.getProperty(tag  + "dtrem")) / TREM_SCALE);
     
+    String shift = props.getProperty(tag + "shift");
     try
     {
-      setShift(Float.parseFloat(props.getProperty(tag + "shift")));
+      setShift(Float.parseFloat(shift));
     }
     catch (Exception e1)
     {
-      System.err.println("[WARN] Problem parsing shift, using 0.0...");
+      System.err.println("[WARN] Unable to parse shift ("+shift+") using 0.0...");
       setShift(0);
     }
     

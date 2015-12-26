@@ -108,7 +108,14 @@ public class OSXAdapter implements InvocationHandler
     // that comes with the various callbacks
     // See setFileHandler above for an example
     public boolean callTarget(Object appleEvent) throws InvocationTargetException, IllegalAccessException {
-        Object result = targetMethod.invoke(targetObject, (Object[])null);
+        Object result = null;
+				try {
+					result = targetMethod.invoke(targetObject, (Object[])null);
+				} catch (Throwable e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+					System.out.println("[WARN] "+e.getMessage());
+				}
         if (result == null) {
             return true;
         }
@@ -117,7 +124,7 @@ public class OSXAdapter implements InvocationHandler
     
     // InvocationHandler implementation
     // This is the entry point for our proxy object; it is called every time an ApplicationListener method is invoked
-    public Object invoke (Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (isCorrectMethod(method, args)) {
             boolean handled = callTarget(args[0]);
             setApplicationEventHandled(args[0], handled);

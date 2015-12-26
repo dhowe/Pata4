@@ -84,7 +84,7 @@ import procontroll.ControllDevice;
  */
 public class Pata4 extends PApplet implements SamplerConstants {
 	static final boolean IGNORE_PREFS = true, EXITING = false;
-	static final String PROJECT_TO_LOAD = "proj/DandelionMessenger";
+	static final String PROJECT_TO_LOAD = "proj/BigDrums3";
 	static final boolean LOAD_CONFIG_FILE = true;
 	static final boolean LOAD_SAMPLE_DIR = false;
 	static final int SAMPLE_RATE = AudioUtils.SAMPLE_RATE;
