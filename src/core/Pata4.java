@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.SwingUtilities;
+
 import mkv.MyGUI.MyGUILabel;
 import mkv.MyGUI.MyGUIPinSlider;
 import pitaru.sonia.Sample;
@@ -17,7 +19,7 @@ import procontroll.ControllDevice;
 
 /*
  * NEW
- * 	Check modified jar/src: MyGuiButton.DRAW_ARROW, Sample.instances, Sample.SHOW_JSYN_ERRORS.
+ * 	Check modified jar/src:Sample.instances
  * 
  * TODO: 
  *     -- re-add declick() as needed (always work from 'unprocessed')
@@ -83,10 +85,10 @@ import procontroll.ControllDevice;
  *    Add dynamic quantize based on 1st sample?  
  */
 public class Pata4 extends PApplet implements SamplerConstants {
+	
 	static final boolean IGNORE_PREFS = true, EXITING = false;
-	static final String PROJECT_TO_LOAD = "proj/BigDrums3";
-	static final boolean LOAD_CONFIG_FILE = true;
-	static final boolean LOAD_SAMPLE_DIR = false;
+	static final String PROJECT_TO_LOAD = "proj/DandelionMessenger";
+	static final boolean LOAD_CONFIG_FILE = false, LOAD_SAMPLE_DIR = false;
 	static final int SAMPLE_RATE = AudioUtils.SAMPLE_RATE;
 	static final String SAMPLE_DIR = "/Users/dhowe/Documents/Workspaces/eclipse-workspace/LiveSampler/";
 
@@ -99,12 +101,10 @@ public class Pata4 extends PApplet implements SamplerConstants {
 	static float microProb = DEFAULT_MICRO_PROB;
 
 	static String cpu = "";
-	static int timestamp = -100000, masterControlsY = 0;
-	public static float[] BG = { 40, 40, 40 };
-	static float masterGain = 0, masterProb = 1;
-	static int currentControlBankIdx = 0;
+	static int timestamp = -100000, masterControlsY = 0, currentControlBankIdx = 0;
+	static float bg[] = new float[3], masterGain = 0, masterProb = 1;
+	
 	static boolean isExiting;
-
 	static private boolean saving = false;
 
 	static SampleUIControlBank[] controlBanks;
@@ -145,6 +145,7 @@ public class Pata4 extends PApplet implements SamplerConstants {
 		Preferences prefs = getPrefs();
 
 		if (!IGNORE_PREFS) {
+			
 			setQuantizeMode(prefs.get(QUANTIZE_MODE, ADDITIVE));
 			microDataSize = prefs.getInt(MICRO_DATA, DEFAULT_MICRO_DATA_SIZE);
 			microPadSize = prefs.getInt(MICRO_PAD, DEFAULT_MICRO_PAD_SIZE);
@@ -165,7 +166,7 @@ public class Pata4 extends PApplet implements SamplerConstants {
 	}
 
 	public void draw() {
-		background(Pata4.BG[0], Pata4.BG[1], Pata4.BG[2]);
+		background(Pata4.bg[0], Pata4.bg[1], Pata4.bg[2]);
 
 		setVisible(Switch.SHOW_UI.on);
 
@@ -212,8 +213,7 @@ public class Pata4 extends PApplet implements SamplerConstants {
 
 		// update every 5 sec
 		if (millis() - timestamp > 5000) {
-			cpu = "CPU: " + AudioUtils.getCpuPercentage();// +
-																										// "  Samples: "+Sample.instances.size();
+			cpu = "CPU: " + AudioUtils.getCpuPercentage();//+"  Samples: "+Sample.instances.size();
 			timestamp = millis();
 		}
 
@@ -670,25 +670,34 @@ public class Pata4 extends PApplet implements SamplerConstants {
 	}
 
 	public void fromXml(File f) {
+
+System.out.println("Pata4.fromXml() :: "+f);
+
 		Properties p = new Properties();
+		
 		try {
 			p.loadFromXML(new FileInputStream(f));
 			System.out.println("[INFO] Loaded: " + f + "\n       ("
 					+ p.getProperty("data.dir") + ")");
+		
 		} catch (Exception e) {
+			
 			System.err.println("[WARN] No config file found: " + f);
 			return;
 		}
+		
 		try {
 			gain.setValue(Integer.parseInt(p.getProperty("master.volume")));
 		} catch (NumberFormatException e1) {
 			gain.setValue((int) (INITIAL_MASTER_VOL * 100));
 		}
+		
 		try {
 			prob.setValue(Integer.parseInt(p.getProperty("master.prob")));
 		} catch (NumberFormatException e) {
 			prob.setValue(100);
 		}
+		
 		Switch.SNIP.set(getBool(p, "master.snip"));
 		for (int i = 0; i < controlBanks.length; i++)
 			controlBanks[i].fromXml(p, i);
@@ -750,6 +759,7 @@ public class Pata4 extends PApplet implements SamplerConstants {
 		// System.out.println("setQuantizeMode("+mode+")");
 
 		quantizeMode = NO_QUANTIZE;
+		
 		if (mode.equals(ADDITIVE))
 			quantizeMode = ADDITIVE_QUANTIZE;
 		else if (mode.equals(SUBTRACTIVE))
@@ -764,14 +774,18 @@ public class Pata4 extends PApplet implements SamplerConstants {
 		return prefs;
 	}
 
-	public static void main(String[] args) {
-		// MyGUIButton.SHOW_BUTTON_ARROW = true;
-		new ApplicationFrame(new Pata4(), 1280, 768);
-	}
-
 	public void mixDown(SampleUIControl sampleUIControl,
 			SampleUIControl[] uiControls) {
 		System.err.println("Pataclysm.mixDown() :: not implemented!");
+	}
+	
+	public static void main(String[] args) {
+		// MyGUIButton.SHOW_BUTTON_ARROW = true;
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				new ApplicationFrame(new Pata4(), 1280, 768);
+			}
+		});
 	}
 
 }// end

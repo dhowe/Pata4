@@ -130,7 +130,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     catch (Exception e) { return; }
     //p.println(fftMax);
     p.rectMode(PApplet.CORNER);
-    p.fill(Pata4.BG[0], Pata4.BG[1], Pata4.BG[2]);
+    p.fill(Pata4.bg[0], Pata4.bg[1], Pata4.bg[2]);
     //p.fill(255);
     p.noStroke();
     //p.rect(getSlider(RATE_SLIDER).label._x+38, getSlider(RATE_SLIDER).label._y - 28, getSlider(RATE_SLIDER).slider._width-15, getSlider(RATE_SLIDER).slider._height);
@@ -210,7 +210,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
           fftMax = f;
       }
 
-      p.fill(Pata4.BG[0], Pata4.BG[1], Pata4.BG[2]);
+      p.fill(Pata4.bg[0], Pata4.bg[1], Pata4.bg[2]);
       p.noStroke();
 
       float xOff = bounds.x + 45;

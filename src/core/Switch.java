@@ -12,11 +12,11 @@ public final class Switch implements SamplerConstants
 {
   static int MENU_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
   
-  public static final Switch SNIP  = new Switch
-    ("Snip-Mode", false, KeyStroke.getKeyStroke(KeyEvent.VK_D, MENU_MASK));
-
+  public static final Switch SNIP  		= new Switch("Snip-Mode", false, KeyEvent.VK_D);
+  public static final Switch SHOW_UI 	= new Switch("VisibleUI", true);
+  
   // public static final Switch MUTE  = new Switch("Mute", false);
-  public static final Switch SHOW_UI    = new Switch("VisibleUI", true);
+
   //public static final Switch HALF_RACKS           = new Switch("half", false);
   //public static final Switch FFT_GRID           = new Switch("ffts",false);
   //public static final Switch ROTATE_Y           = new Switch("roty",false);
@@ -44,17 +44,17 @@ public final class Switch implements SamplerConstants
 
   boolean on;
   String name;
-  KeyStroke key;
+  int key;
   Rectangle bounds;
   
   private Switch(String name, boolean val) {
-    this(name, val, null);
+    this(name, val, 0);
   }
   
-  private Switch(String name, boolean val, KeyStroke accelerator) {
+  private Switch(String name, boolean val, int ke) {
     this.name = name;
     this.on = val;
-    this.key = accelerator;
+    this.key = ke;
   }
   
   public void setPosition(int xOff, int yOff) {

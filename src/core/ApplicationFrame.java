@@ -15,7 +15,6 @@ import processing.core.PApplet;
 
 public class ApplicationFrame extends JFrame implements SamplerConstants, ActionListener// ChangeListener
 { 
-  static int MENU_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
   static boolean OSX = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));      
   
   static File sampleDir, projDir;
@@ -35,9 +34,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
   
   static String[] sampleMenuNames = { OPEN, CUT, COPY, PASTE, REVERT, REVERSE, PAD, DECLICK };
   static String[] sampleCbMenuNames = { SOLO, MUTE, SWEEP, BOUNCE, }; 
-  static String[][] nestedMenus = {
-    { SHIFT,     "-12", "-7", "-5", "-2", "  0", "  2", "  3", "  5", "  12",     "  0" },
-  };
+  static String[][] nestedMenus = {{ SHIFT, "-12", "-7", "-5", "-2", "  0", "  2", "  3", "  5", "  12", "  0" }};
   static String[] bankMenuNames = { SOLO, MUTE, CLEAR, PAD, SWEEP, BOUNCE, REVERT, REVERSE, PAD, DECLICK };
   static ButtonGroup qGroup;
 
@@ -59,13 +56,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
         quit();
     }});
     
-    JPanel panel = new javax.swing.JPanel();
-    Color purple = new Color(40);
-    Pata4.BG = new float[] { purple.getRed(), purple.getGreen(), purple.getBlue() };
-    panel.setBackground(purple);
-    panel.setBounds(20, 0, w, h + 40);
-    panel.add(sketch);
-    this.add(panel);
+    JPanel panel = createSketchPanel(sketch, w, h);
 
     aboutBox = createAbout();
     prefsBox = createPrefs();
@@ -76,8 +67,20 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     
     doLayout(w, h);
     
-    sketch.requestFocus();
+    panel.requestFocus();
   }
+
+	private JPanel createSketchPanel(PApplet sketch, int w, int h) {
+		
+		JPanel panel = new javax.swing.JPanel();
+    Color purple = new Color(40);
+    Pata4.bg = new float[] { purple.getRed(), purple.getGreen(), purple.getBlue() };
+    panel.setBackground(purple);
+    panel.setBounds(20, 0, w, h + 40);
+    panel.add(sketch);
+    this.add(panel);
+		return panel;
+	}
   
   private JDialog createPrefs()
   {
@@ -244,16 +247,16 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     
     // FILE_MENU ----------------------
     mainMenuBar.add(fileMenu = new JMenu("File"));
-    fileMenu.setMnemonic('F');
+    setShortcut(fileMenu, KeyEvent.VK_F);
 
     fileMenu.add(openMI = new JMenuItem("Open..."));
-    openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, MENU_MASK));
+    setShortcut(openMI, KeyEvent.VK_O);
     openMI.addActionListener(this);
     
     fileMenu.addSeparator();
     
     fileMenu.add(saveMI = new JMenuItem("Save"));
-    saveMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_MASK));
+    setShortcut(saveMI, KeyEvent.VK_S);
     saveMI.addActionListener(this);
     
       
@@ -267,27 +270,30 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
       fileMenu.addSeparator();
       
       fileMenu.add(quitMI = new JMenuItem("Quit"));
-      quitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, MENU_MASK));
+      setShortcut(quitMI, KeyEvent.VK_Q);
       quitMI.addActionListener(this);
     }
     
     // GLOBAL_MENU ---------------------
     if (SHOW_GLOBAL_MENU) {
+    	
       mainMenuBar.add(globalMenu = new JMenu("Global"));
-      fileMenu.setMnemonic('G');
+      setShortcut(fileMenu, KeyEvent.VK_G);
+      
       JMenuItem nextMI = null;
       for (int i = 0; i < Switch.ACTIVE.length; i++) {
         globalMenu.add(nextMI = new JCheckBoxMenuItem(Switch.ACTIVE[i].name));
         nextMI.setSelected(Switch.ACTIVE[i].on);
-        nextMI.setAccelerator(Switch.ACTIVE[i].key);
+        setShortcut(nextMI, Switch.ACTIVE[i].key);
         nextMI.addActionListener(this);
       }
     }
     
     // BANK_MENU ---------------------
     if (SHOW_BANK_MENU) {
+    	
       mainMenuBar.add(bankMenu = new JMenu("Bank"));
-      bankMenu.setMnemonic('B');
+      setShortcut(bankMenu, KeyEvent.VK_B);
       
       JMenuItem jmi = null;
       for (int i = 0; i < bankMenuNames.length; i++)
@@ -310,12 +316,15 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
         sampleMenu.add(jmi = new JMenuItem(sampleMenuNames[i]));
         jmi.addActionListener(this);
         // keyboard shortcuts
-        if (sampleMenuNames[i].equals(PASTE))
-          jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, MENU_MASK));
+        if (sampleMenuNames[i].equals(PASTE)) { 
+          setShortcut(jmi, KeyEvent.VK_X);
+        }
         else if (sampleMenuNames[i].equals(CUT))
-          jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, MENU_MASK));
+          //jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, MENU_MASK));
+        	setShortcut(jmi, KeyEvent.VK_X);
         else if (sampleMenuNames[i].equals(COPY))
-          jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, MENU_MASK));
+          //jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, MENU_MASK));
+        	setShortcut(jmi, KeyEvent.VK_C);
     }
     
     
@@ -326,7 +335,8 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     for (int i = 0; i < QUANTIZE_MODES.length; i++)
     {
       JRadioButtonMenuItem rmi = new JRadioButtonMenuItem(QUANTIZE_MODES[i]);
-      rmi.setAccelerator(KeyStroke.getKeyStroke(accelerators[i], MENU_MASK));
+      //rmi.setAccelerator(KeyStroke.getKeyStroke(accelerators[i], MENU_MASK));
+      setShortcut(rmi, accelerators[i]);
       rmi.addActionListener(this);
       rmi.setSelected(i==0);
       quantizeMenu.add(rmi);
@@ -360,12 +370,24 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     setJMenuBar(mainMenuBar);
   }
 
+	private void setShortcut(JMenuItem jmi, int keyEvent) {
+//		JMenuItem menuItemOpen = new JMenuItem("Open");
+//		menuItemOpen.setMnemonic(KeyEvent.VK_O);
+//		
+//		KeyStroke keyStrokeToOpen = KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK);
+//		menuItemOpen.setAccelerator(keyStrokeToOpen);
+		
+		if (!(jmi instanceof JMenu))
+			jmi.setAccelerator(KeyStroke.getKeyStroke(keyEvent, KeyEvent.META_DOWN_MASK));
+		jmi.setMnemonic(keyEvent);
+	}
+
   public void actionPerformed(ActionEvent e)
   {
     Object src = e.getSource();
     String cmd = e.getActionCommand();
     
-    // System.out.println("ApplicationFrame.actionPerformed("+src.getClass().getName()+","+cmd+")");
+    System.out.println("ApplicationFrame.actionPerformed("+src.getClass().getName()+","+cmd+")");
 
     // global-switch menu
     for (int i = 0; i < Switch.ACTIVE.length; i++)
@@ -474,17 +496,28 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
 
   private void loadProject()
   {
+
     String s = System.getProperty("user.dir");
     File def = new File(s +"/"+projDir);
-    final JFileChooser fc = new JFileChooser(def);
+    System.out.println("ApplicationFrame.loadProject() :: "+def);
+
+    final JFileChooser fc = new JFileChooser();
     fc.setFileFilter(new ExampleFileFilter("xml"));
-    new Thread() {
-      public void run() {
-        fc.showOpenDialog(p);
-        File xml = fc.getSelectedFile();
-        if (xml != null) ((Pata4)p).fromXml(xml);
-      }
-    }.start();
+    fc.setCurrentDirectory(def);
+    int result = fc.showOpenDialog(p);
+    if (result == JFileChooser.APPROVE_OPTION) {
+    	File xml = fc.getSelectedFile();
+    	if (xml != null) ((Pata4)p).fromXml(xml);
+
+      // user selects a file
+    }
+//    new Thread() {
+//      public void run() {
+//        fc.showOpenDialog(p);
+//        File xml = fc.getSelectedFile();
+//        if (xml != null) ((Pata4)p).fromXml(xml);
+//      }
+//    }.start();
   }
 
   public void about()
