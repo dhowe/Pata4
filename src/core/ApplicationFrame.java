@@ -74,7 +74,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
 		
 		JPanel panel = new javax.swing.JPanel();
     Color purple = new Color(40);
-    Pata4.bg = new float[] { purple.getRed(), purple.getGreen(), purple.getBlue() };
+    Pataclysm.bg = new float[] { purple.getRed(), purple.getGreen(), purple.getBlue() };
     panel.setBackground(purple);
     panel.setBounds(20, 0, w, h + 40);
     panel.add(sketch);
@@ -133,7 +133,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     l1.setBounds(x1, y1, d.width, d.height);
     
     microDataSpinner = new JSpinner(new SpinnerNumberModel(    
-        Pata4.microDataSize, // initial
+        Pataclysm.microDataSize, // initial
         100,                                                              // min
         SAMPLE_RATE/2,                                                    // max
         100));                                                            // step     
@@ -148,7 +148,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     l2.setBounds(microDataSpinner.getX()+microDataSpinner.getWidth()+40, y1, d.width, d.height);
     
     microPadSpinner = new JSpinner(new SpinnerNumberModel
-        (Pata4.getPrefs().getInt(MICRO_PAD, DEFAULT_MICRO_PAD_SIZE), 1000, SAMPLE_RATE, 200));      
+        (Pataclysm.getPrefs().getInt(MICRO_PAD, DEFAULT_MICRO_PAD_SIZE), 1000, SAMPLE_RATE, 200));      
     microPadSpinner.setName(MICRO_PAD);
     //s2.addChangeListener(this);
     d = microPadSpinner.getPreferredSize();
@@ -160,7 +160,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     d = l3.getPreferredSize();
     l3.setBounds(x1, y1, d.width, d.height);
     
-    microProbSpinner = new JSpinner(new SpinnerNumberModel(Pata4.microProb, 0.1, 1.0, .05)); 
+    microProbSpinner = new JSpinner(new SpinnerNumberModel(Pataclysm.microProb, 0.1, 1.0, .05)); 
     microProbSpinner.setName(MICRO_PROB);
     //s3.addChangeListener(this);
     d = microProbSpinner.getPreferredSize();
@@ -398,14 +398,14 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
        }
     }
     
-    if (uiMan == null) uiMan = Pata4.uiMan;
+    if (uiMan == null) uiMan = Pataclysm.uiMan;
     
     // quantize menu
     for (int i = 0; i < quantizeMenu.getItemCount(); i++)
     {
       JMenuItem mi = quantizeMenu.getItem(i);
       if (src == mi) {
-        Pata4.setQuantizeMode(mi.getActionCommand());
+        Pataclysm.setQuantizeMode(mi.getActionCommand());
         return;
       }
     }
@@ -415,7 +415,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     {
       JMenuItem mi = sampleMenu.getItem(i);
       if (src == mi) {
-        Pata4.currentControl().doAction(-1, -1, mi.getActionCommand());
+        Pataclysm.currentControl().doAction(-1, -1, mi.getActionCommand());
         return;
       }
     }
@@ -425,7 +425,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     {
       JMenuItem mi = bankMenu.getItem(i);
       if (src == mi) {
-        Pata4.currentControlBank().doAction(-1, -1, mi.getActionCommand());
+        Pataclysm.currentControlBank().doAction(-1, -1, mi.getActionCommand());
         return;
       }
     }
@@ -460,19 +460,19 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
 
   private void savePrefs() 
   {
-    Preferences prefs = Pata4.getPrefs();
+    Preferences prefs = Pataclysm.getPrefs();
     
-    Pata4.microDataSize = ((Integer)microDataSpinner.getValue()).intValue();
-    prefs.putInt(MICRO_DATA, Pata4.microDataSize);
+    Pataclysm.microDataSize = ((Integer)microDataSpinner.getValue()).intValue();
+    prefs.putInt(MICRO_DATA, Pataclysm.microDataSize);
     
-    Pata4.microPadSize = ((Integer)microPadSpinner.getValue()).intValue();
-    prefs.putInt(MICRO_PAD, Pata4.microPadSize);
+    Pataclysm.microPadSize = ((Integer)microPadSpinner.getValue()).intValue();
+    prefs.putInt(MICRO_PAD, Pataclysm.microPadSize);
     
-    Pata4.microProb = ((Float)microProbSpinner.getValue()).floatValue();
-    prefs.putFloat(MICRO_PROB, Pata4.microProb);
+    Pataclysm.microProb = ((Float)microProbSpinner.getValue()).floatValue();
+    prefs.putFloat(MICRO_PROB, Pataclysm.microProb);
     
     String mode = QUANTIZE_MODES[modeList.getSelectedIndex()];
-    Pata4.setQuantizeMode(mode);
+    Pataclysm.setQuantizeMode(mode);
     prefs.put(QUANTIZE_MODE, mode);
     
     prefsBox.setVisible(false);
@@ -507,7 +507,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     int result = fc.showOpenDialog(p);
     if (result == JFileChooser.APPROVE_OPTION) {
     	File xml = fc.getSelectedFile();
-    	if (xml != null) ((Pata4)p).fromXml(xml);
+    	if (xml != null) ((Pataclysm)p).fromXml(xml);
 
       // user selects a file
     }
@@ -542,7 +542,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
         if (f != null)  {
           projDir = f;
           System.out.println("Selected: "+projDir);
-          ((Pata4)p).saveToXml(projDir);
+          ((Pataclysm)p).saveToXml(projDir);
         }
       }
     }.start();
@@ -561,11 +561,11 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     
     if (option == JOptionPane.YES_OPTION) {
     	
-      Pata4.isExiting = true;
+      Pataclysm.isExiting = true;
       
       System.out.print("[INFO] Exiting...");
       
-      for (int i = 0; Pata4.isSaving(); i++) {
+      for (int i = 0; Pataclysm.isSaving(); i++) {
         try {
           Thread.sleep(100);
         }
@@ -587,10 +587,10 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
   @SuppressWarnings("boxing")
 	private void refreshPrefsData()
   {
-    microDataSpinner.setValue(Pata4.microDataSize);
-    microPadSpinner.setValue(Pata4.microPadSize);
-    microProbSpinner.setValue(Pata4.microProb);
-    String mode = Pata4.getQuantizeMode();
+    microDataSpinner.setValue(Pataclysm.microDataSize);
+    microPadSpinner.setValue(Pataclysm.microPadSize);
+    microProbSpinner.setValue(Pataclysm.microProb);
+    String mode = Pataclysm.getQuantizeMode();
     for (int i = 0; i < QUANTIZE_MODES.length; i++) {
       if (mode.equals(QUANTIZE_MODES[i]))
         modeList.setSelectedIndex(i);

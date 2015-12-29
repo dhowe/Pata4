@@ -30,7 +30,7 @@ public class RecordBuffer implements SamplerConstants
   {
     this.levels.clear();
     this.recording = true;
-    this.buffer = new Sample(Pata4.SAMPLE_RATE * MAX_SAMPLE_LEN);
+    this.buffer = new Sample(Pataclysm.SAMPLE_RATE * MAX_SAMPLE_LEN);
     LiveInput.startRec(buffer);
   }
 
@@ -80,15 +80,15 @@ public class RecordBuffer implements SamplerConstants
     // get the sample frames
     float[] data = null;
     
-    if (Pata4.quantizeMode == NO_QUANTIZE)
+    if (Pataclysm.quantizeMode == NO_QUANTIZE)
     {
       // just strip off the excess
       data = new float[lastRealFrame];
       System.arraycopy(frames, 0, data, 0, lastRealFrame); 
     }
-    else if (Pata4.quantizeMode == MICRO_QUANTIZE)
+    else if (Pataclysm.quantizeMode == MICRO_QUANTIZE)
     {
-      data = createMicroSample(frames, lastRealFrame, maxFrameIdx, Pata4.minQuantum);
+      data = createMicroSample(frames, lastRealFrame, maxFrameIdx, Pataclysm.minQuantum);
       if (data == null) {
         System.err.println("[WARN] #6 Null data!");
         return null;
@@ -97,7 +97,7 @@ public class RecordBuffer implements SamplerConstants
     else {
       data = new float[lastRealFrame];
       System.arraycopy(frames, 0, data, 0, lastRealFrame); 
-      data = quantizeSampleData(data, Pata4.minQuantum);
+      data = quantizeSampleData(data, Pataclysm.minQuantum);
       if (data == null) {
         System.err.println("[WARN] #7 Null data!");
         return null;
@@ -126,7 +126,7 @@ public class RecordBuffer implements SamplerConstants
   private float[] quantizeSampleData(float[] data, int minQuantum)
   {
     //System.out.println("RecordBuffer.quantizeSampleData(mode="+SamplerFi.quantizeMode+", minQuantum="+minQuantum+")");
-    switch(Pata4.quantizeMode) 
+    switch(Pataclysm.quantizeMode) 
     {
       case NO_QUANTIZE:
         return data;
@@ -187,10 +187,10 @@ public class RecordBuffer implements SamplerConstants
   
   private float[] createMicroSample(float[] frames, int endframe, int maxFrameIdx, int minQuantum)
   {
-    int startClipIdx = Math.max(0, maxFrameIdx - Pata4.microDataSize);
-    int endClipIdx = Math.min(endframe, maxFrameIdx + Pata4.microDataSize);
-    float[] data = new float[(endClipIdx - startClipIdx)+(Pata4.microPadSize)];
-    System.arraycopy(frames, startClipIdx, data, Pata4.microPadSize/2, data.length-Pata4.microPadSize);
+    int startClipIdx = Math.max(0, maxFrameIdx - Pataclysm.microDataSize);
+    int endClipIdx = Math.min(endframe, maxFrameIdx + Pataclysm.microDataSize);
+    float[] data = new float[(endClipIdx - startClipIdx)+(Pataclysm.microPadSize)];
+    System.arraycopy(frames, startClipIdx, data, Pataclysm.microPadSize/2, data.length-Pataclysm.microPadSize);
     return quantizeSampleData(data, minQuantum);
   }
 

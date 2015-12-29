@@ -16,10 +16,10 @@ public class UIManager implements SamplerConstants, ActionListener
 
   MyGUI gui;
   PFont font;
-  Pata4 app;
+  Pataclysm app;
   SampleUIControlBank[] banks;
 
-  public UIManager(Pata4 p)
+  public UIManager(Pataclysm p)
   {
     this.app = p;
 
@@ -39,12 +39,12 @@ public class UIManager implements SamplerConstants, ActionListener
 
     // global sliders ---------------------------
 
-    p.gainLabel = new MyGUILabel(p, "GAIN", UI_XOFFSET + 5, Pata4.masterControlsY);
+    p.gainLabel = new MyGUILabel(p, "GAIN", UI_XOFFSET + 5, Pataclysm.masterControlsY);
     p.gain = new GUIPinSlider(p, p.gainLabel._x + 110, p.gainLabel._y, 140, 12, 0, 100);
     gui.add(p.gain);
     gui.add(p.gainLabel);
 
-    p.probLabel = new MyGUILabel(p, "PROB", p.gain._x + 108, Pata4.masterControlsY);
+    p.probLabel = new MyGUILabel(p, "PROB", p.gain._x + 108, Pataclysm.masterControlsY);
     p.prob = new GUIPinSlider(p, p.probLabel._x + 110, p.probLabel._y, 140, 12, 0, 100);
     p.prob.setValue(100);
     gui.add(p.prob);
@@ -309,14 +309,14 @@ public class UIManager implements SamplerConstants, ActionListener
     // System.out.println("UIManager.actionPerformed("+source+")");
 
     // check the global sliders
-    if (source == Pata4.gain)
+    if (source == Pataclysm.gain)
     {
-      app.setMasterVolume(Pata4.gain.getValue() / 100f);
+      app.setMasterVolume(Pataclysm.gain.getValue() / 100f);
       return;
     }
-    else if (source == Pata4.prob)
+    else if (source == Pataclysm.prob)
     {
-      app.setMasterProb(Pata4.prob.getValue() / 100f);
+      app.setMasterProb(Pataclysm.prob.getValue() / 100f);
       return;
     }
 

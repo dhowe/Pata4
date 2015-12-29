@@ -32,7 +32,7 @@ public class USBFootSwitch extends Joystick
   	return fs;
   }
   
-  public void setup(Pata4 p, ControllDevice device)
+  public void setup(Pataclysm p, ControllDevice device)
   {
     this.app = p;   
     this.device = device;

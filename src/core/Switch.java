@@ -80,11 +80,11 @@ public final class Switch implements SamplerConstants
       bounds.height = (int)p.textAscent()+(RECT_PAD*2);
     p.noFill();
     p.rect(bounds.x, bounds.y, bounds.width, bounds.height);
-    p.fill(on ? Pata4.TEXT_FILL : 200);
+    p.fill(on ? Pataclysm.TEXT_FILL : 200);
     if (on)
       p.fill(200, 100, 100);
     else
-      p.fill(Pata4.TEXT_FILL);
+      p.fill(Pataclysm.TEXT_FILL);
     p.text(name, bounds.x+RECT_PAD, bounds.y+12);
   }
   

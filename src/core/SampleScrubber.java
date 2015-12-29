@@ -31,7 +31,7 @@ public class SampleScrubber implements SamplerConstants
     this.stopFrame = testSample.getNumFrames();
   }*/
 
-  public SampleScrubber(Pata4 p, SampleUIControl svui, int xPos, int yPos) {
+  public SampleScrubber(Pataclysm p, SampleUIControl svui, int xPos, int yPos) {
     this(p, svui, xPos, yPos, DEFAULT_SCRUB_W, DEFAULT_SCRUB_H);
   }
 
@@ -205,7 +205,7 @@ public class SampleScrubber implements SamplerConstants
     catch (Exception e1)
     {
       System.out.println("[WARN] (Caught) updateScrubPos-0: Error getting currentFrame!");
-      System.out.println(Pata4.stackToString(e1));
+      System.out.println(Pataclysm.stackToString(e1));
       return;
     }
     
@@ -224,7 +224,7 @@ public class SampleScrubber implements SamplerConstants
       }
       catch (Exception e)
       {
-        System.out.println("[WARN] updateScrubPos-1:\n"+Pata4.stackToString(e));
+        System.out.println("[WARN] updateScrubPos-1:\n"+Pataclysm.stackToString(e));
       }
       lastFrame = Integer.MAX_VALUE;
     }
@@ -237,7 +237,7 @@ public class SampleScrubber implements SamplerConstants
     }
     catch (Exception e)
     {
-      System.out.println("[WARN] updateScrubPos-2:\n"+Pata4.stackToString(e));
+      System.out.println("[WARN] updateScrubPos-2:\n"+Pataclysm.stackToString(e));
     }
     if (cur < lastFrame) 
     {

@@ -20,7 +20,7 @@ public class SampleUIControlBank implements SamplerConstants, Actionable
   MyGUIPinSlider volumeControl, probControl;
   MyGUILabel volumeLabel, probLabel;
   SampleUIControl[] uiControls;
-  Pata4 app;
+  Pataclysm app;
   MyGUI gui;
    
   JPopupAppMenu bankJContextMenu;
@@ -30,12 +30,12 @@ public class SampleUIControlBank implements SamplerConstants, Actionable
   private static int ID;
   
 
-  SampleUIControlBank(Pata4 p, MyGUI gui, int xPos)
+  SampleUIControlBank(Pataclysm p, MyGUI gui, int xPos)
   {
     this(p, gui, xPos, false);
   }
 
-  public SampleUIControlBank(Pata4 p, MyGUI gui, int x, boolean enabled)
+  public SampleUIControlBank(Pataclysm p, MyGUI gui, int x, boolean enabled)
   {
     this.app = p;
     this.x = x;
@@ -157,7 +157,7 @@ public class SampleUIControlBank implements SamplerConstants, Actionable
     return uiControls[idx];
   }
 
-  private static void drawInfo(Pata4 p, SampleUIControlBank[] controlSets)
+  private static void drawInfo(Pataclysm p, SampleUIControlBank[] controlSets)
   {
     //if (!PataClysm.SHOW_UI) return;
 
@@ -232,7 +232,7 @@ public class SampleUIControlBank implements SamplerConstants, Actionable
 
   public void setSolo(boolean b)
   {
-    Pata4.uiMan.updateBankSoloMode(this, b);
+    Pataclysm.uiMan.updateBankSoloMode(this, b);
   }
 
   private void mute()
@@ -278,7 +278,7 @@ public class SampleUIControlBank implements SamplerConstants, Actionable
     setVolume(Float.parseFloat(p.getProperty("bank" + i + ".volume")));
     setProb(Float.parseFloat(p.getProperty("bank" + i + ".prob")));
     try {
-      setSolo(Pata4.getBool(p, "bank" + i +".solo"));
+      setSolo(Pataclysm.getBool(p, "bank" + i +".solo"));
     }
     catch (Exception e) {
       System.out.println("[WARN] No property: 'solo' found for "+this);

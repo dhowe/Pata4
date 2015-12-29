@@ -19,6 +19,9 @@ import procontroll.ControllDevice;
 
 /*
  * NEW
+ *  Tap-tempo
+ *  Undo-last
+ *  Automate
  * 	Check modified jar/src:Sample.instances
  * 
  * TODO: 
@@ -84,7 +87,7 @@ import procontroll.ControllDevice;
  *          
  *    Add dynamic quantize based on 1st sample?  
  */
-public class Pata4 extends PApplet implements SamplerConstants {
+public class Pataclysm extends PApplet implements SamplerConstants {
 	
 	static final boolean IGNORE_PREFS = true, EXITING = false;
 	static final String PROJECT_TO_LOAD = "proj/DandelionMessenger";
@@ -166,7 +169,7 @@ public class Pata4 extends PApplet implements SamplerConstants {
 	}
 
 	public void draw() {
-		background(Pata4.bg[0], Pata4.bg[1], Pata4.bg[2]);
+		background(Pataclysm.bg[0], Pataclysm.bg[1], Pataclysm.bg[2]);
 
 		setVisible(Switch.SHOW_UI.on);
 
@@ -770,7 +773,7 @@ System.out.println("Pata4.fromXml() :: "+f);
 
 	static Preferences getPrefs() {
 		if (prefs == null)
-			prefs = Preferences.userRoot().node(Pata4.class.getName());
+			prefs = Preferences.userRoot().node(Pataclysm.class.getName());
 		return prefs;
 	}
 
@@ -783,7 +786,7 @@ System.out.println("Pata4.fromXml() :: "+f);
 		// MyGUIButton.SHOW_BUTTON_ARROW = true;
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				new ApplicationFrame(new Pata4(), 1280, 768);
+				new ApplicationFrame(new Pataclysm(), 1280, 768);
 			}
 		});
 	}

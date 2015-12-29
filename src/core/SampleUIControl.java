@@ -47,26 +47,26 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
   Rectangle bounds, buttonBounds;
 
 
-  public SampleUIControl(Pata4 p, SampleUIControlBank bank, MyGUI gui, String text, int idx, int x, int y)
+  public SampleUIControl(Pataclysm p, SampleUIControlBank bank, MyGUI gui, String text, int idx, int x, int y)
   {
     this.p = p;
     this.id = ++ID;
     this.bank = bank;
     this.bounds = new Rectangle(x, y, W, H);
-    sampleDir = Pata4.dataFolder();
+    sampleDir = Pataclysm.dataFolder();
 
     buttonBounds = new Rectangle(x + W - 8, y + 8, 10, 10); // x+7 for left-edge
     gui.add(sampleMenuButton = new SamplerButton(p, buttonBounds.x, buttonBounds.y, buttonBounds.height, buttonBounds.width));
 
-    sliders = new LabelSlider[Pata4.currentSliderTypes.length];
+    sliders = new LabelSlider[Pataclysm.currentSliderTypes.length];
 
     scrubSlider = new SampleScrubber(p, this, x, y + 132);
 
     int yOff = y + 11;
     gui.add(levelLabel = new MyGUILabel(p, "LEVEL", x + 9, y+10));
     for (int i = 0; i < sliders.length; i++) {
-      sliders[i] = new LabelSlider(p, Pata4.currentSliderTypes[i], gui, this, i, x + 6, yOff+=23);
-      if (Pata4.currentSliderTypes[i] == SHIFT_SLIDER)
+      sliders[i] = new LabelSlider(p, Pataclysm.currentSliderTypes[i], gui, this, i, x + 6, yOff+=23);
+      if (Pataclysm.currentSliderTypes[i] == SHIFT_SLIDER)
         sliders[i].setContinuous(false); // hmm???
     }
     
@@ -88,7 +88,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     p.rect(x, y, W, H);
 
     // selected rect
-    if (this == Pata4.currentControl())
+    if (this == Pataclysm.currentControl())
     {
       p.noFill();
       p.stroke(255);
@@ -115,7 +115,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
   
   private void drawLevels()
   {
-    if (sample == null || Pata4.isExiting) return;
+    if (sample == null || Pataclysm.isExiting) return;
     try
     {
       float[] fft = sample.getSpectrum(SPECTRUM_LENGTH * 2, sample.getCurrentFrame());
@@ -130,7 +130,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     catch (Exception e) { return; }
     //p.println(fftMax);
     p.rectMode(PApplet.CORNER);
-    p.fill(Pata4.bg[0], Pata4.bg[1], Pata4.bg[2]);
+    p.fill(Pataclysm.bg[0], Pataclysm.bg[1], Pataclysm.bg[2]);
     //p.fill(255);
     p.noStroke();
     //p.rect(getSlider(RATE_SLIDER).label._x+38, getSlider(RATE_SLIDER).label._y - 28, getSlider(RATE_SLIDER).slider._width-15, getSlider(RATE_SLIDER).slider._height);
@@ -210,7 +210,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
           fftMax = f;
       }
 
-      p.fill(Pata4.bg[0], Pata4.bg[1], Pata4.bg[2]);
+      p.fill(Pataclysm.bg[0], Pataclysm.bg[1], Pataclysm.bg[2]);
       p.noStroke();
 
       float xOff = bounds.x + 45;
@@ -226,7 +226,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     }
     catch (Exception e)
     {
-      if (!Pata4.isExiting) {
+      if (!Pataclysm.isExiting) {
         System.out.println("SampleUIControl.drawFFT-Error2" + e);
 //if (Sample.THROW_JSYN_ERRORS)
 //  System.out.println(Pataclysm.stackToString(e));
@@ -239,8 +239,8 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     for (int i = 0; i < sliders.length; i++)
       sliders[i].reset();
     
-    if (Pata4.quantizeMode==MICRO_QUANTIZE)
-      getSlider(PROB_SLIDER).setValue((int)(Pata4.microProb*100));
+    if (Pataclysm.quantizeMode==MICRO_QUANTIZE)
+      getSlider(PROB_SLIDER).setValue((int)(Pataclysm.microProb*100));
   }
 
   public Sample getSample()
@@ -288,7 +288,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     {
       if (rawVal < 5)
         rawVal = 0; // make silent if close
-      val = (rawVal / 100f) * (Pata4.masterGain * bank.getGain() * GAIN_SCALE);
+      val = (rawVal / 100f) * (Pataclysm.masterGain * bank.getGain() * GAIN_SCALE);
       // System.out.println("SampleUIControl.mapToSlider() bank: "+bank.getGain()+" master: "+SamplerFi.masterGain+" raw="+rawVal);
       sample.setVolume(val); // 0 -> 1
     }
@@ -305,7 +305,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     }
     else if (type == PROB_SLIDER)
     {
-      aggregateProb = (rawVal / 100f) * Pata4.masterProb * bank.getProb();
+      aggregateProb = (rawVal / 100f) * Pataclysm.masterProb * bank.getProb();
     }
   }
 
@@ -404,7 +404,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
 
   public void setSolo(boolean b)
   {
-    Pata4.uiMan.updateSoloMode(this, b);
+    Pataclysm.uiMan.updateSoloMode(this, b);
   }
   
   public void mute()
@@ -440,7 +440,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
   
   void setGain(float vol) // 0 - 1
   {
-    int raw = (int) (vol * 100f / (Pata4.masterGain * bank.getGain() * GAIN_SCALE));
+    int raw = (int) (vol * 100f / (Pataclysm.masterGain * bank.getGain() * GAIN_SCALE));
     setPropertyWithSliderType(GAIN_SLIDER, raw);
   }
   
@@ -514,7 +514,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
   private Sample cloneDuplicateSample(Sample newSample)
   {
     // We have a sample, check for a duplicate (why?)
-    List l = ((Pata4) p).getAllSamples();
+    List l = ((Pataclysm) p).getAllSamples();
     if (l.contains(newSample))
     {
       // System.out.print("Cloning duplicate: "+newSample);
@@ -729,7 +729,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
 
   private boolean getBool(Properties p, String key)
   {
-    return Pata4.getBool(p, key);
+    return Pataclysm.getBool(p, key);
   }
 
   // mouse methods ---------------------
