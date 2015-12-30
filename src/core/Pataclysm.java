@@ -3,7 +3,6 @@ package core;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.*;
-import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -606,16 +605,6 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		return result;
 	}
 
-	private static void copyFile(File src, File dst) {
-		try {
-			FileChannel in = new FileInputStream(src).getChannel();
-			FileChannel out = new FileOutputStream(dst).getChannel();
-			in.transferTo(0, in.size(), out);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	private void preloadFiles(String sampleDir) {
 		if (LOAD_SAMPLE_DIR) {
 			if (sampleDir == null)
@@ -635,7 +624,8 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		}
 	}
 
-	private void loadSamplesFromDir(String directory) {
+	private void loadSamplesFromDir(String directory) { 
+		
 		File dir = new File(directory);
 		if (!dir.exists())
 			throw new RuntimeException("No sampleDir(" + directory + ") found in: "
@@ -676,14 +666,12 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 
 	public void fromXml(File f) {
 
-		// System.out.println("Pataclysm.fromXml() :: "+f);
-
 		Properties p = new Properties();
 
 		try {
 			p.loadFromXML(new FileInputStream(f));
-			System.out.println("[INFO] Loaded: " + f + "\n       ("
-					+ p.getProperty("data.dir") + ")");
+			System.out.println("[INFO] Loaded: " + f); 
+			//+ "\n       ("+ p.getProperty("data.dir") + ")");
 
 		} catch (Exception e) {
 

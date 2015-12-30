@@ -74,7 +74,6 @@ public class SampleScrubber implements SamplerConstants
     
     // red loop line -----------------------
     if (pressed & partial) {
-     /// p.strokeWeight(2);
       p.stroke(255, 20, 20);
       p.line(x + startX, y, x + stopX, y);
     }
@@ -309,7 +308,6 @@ public class SampleScrubber implements SamplerConstants
     } catch (RuntimeException e) {
       System.err.println("[WARN] SampleScrubber.resetStartStopFrames() : " + e.getMessage());
     }
-    //System.out.println("SampleScrubber.resetStartStopFrames().startFrame="+startFrame+" stopFrame="+stopFrame);
   }
 
   private Sample getSample() {

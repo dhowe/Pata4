@@ -986,9 +986,11 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
   {
     if (sample == null) return;
 
-    // restore orig data from 'unprocessed' TODO: fix bug here #1
-    if (frames.length != unprocessed.length)
-    	frames = new float[unprocessed.length];
+    if (frames.length != unprocessed.length) {  // fix to issue #1
+    	frames = new float[unprocessed.length];    	
+    	sample.delete(); 
+    	sample = new Sample(frames.length);
+    }
     
     System.arraycopy(unprocessed, 0, frames, 0, frames.length);
     sample.write(frames);
