@@ -15,7 +15,11 @@ import processing.core.PApplet;
 public class SampleUIControl implements SamplerConstants, LerpListener, Actionable
 {
   private static final float MAX_PAN = .8f, MIN_PAN = -.8f;
+  private final int PIN_SLIDER_W = 140, PIN_SLIDER_H=12;
   
+  public static final int W = 198, H = 150;
+  private static final float GAIN_SCALE = 2f;
+    
   private static int ID;
   private static String sampleDir;
   private static float[] clipboard;
@@ -45,7 +49,6 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
 
   JPopupAppMenu sampleJContextMenu;
   Rectangle bounds, buttonBounds;
-
 
   public SampleUIControl(Pataclysm p, SampleUIControlBank bank, MyGUI gui, String text, int idx, int x, int y)
   {
@@ -110,7 +113,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     if (sweeper != null && sample != null) 
       sample.setPan(sweeper.update());
 
-    scrubSlider.draw(sample);
+    scrubSlider.draw();
   }
   
   private void drawLevels()
@@ -330,7 +333,8 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     if (sample != null)
       sample.delete();
     sample = null;
-    frames = unprocessed = null;
+    frames = null;
+    unprocessed = null;
   }
 
   public void copy()
@@ -559,7 +563,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     // update the sample
     Sample lastSample = sample; // previous
 
-    // write sample data to 'frames
+    // write raw sample data to frames
     this.frames = new float[s.getNumFrames()];
     s.read(frames);
 
@@ -765,8 +769,8 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     else if (item.equals(MUTE))
       setMuted(!isMuted());
 
-    else if (item.equals(PAD))
-      doubleLength();
+    else if (item.equals(DOUBLE))
+      doDoubleLength();
     
     else if (item.equals(SOLO))
       setSolo(!isSolo());
@@ -784,7 +788,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     }
   }
 
-  void doubleLength()
+  void doDoubleLength()
   { 
     if (sample == null) return;
     
@@ -801,7 +805,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
   
   private Sample padSample(Sample s, int newLength)
   {
-    // get the current data in the sample
+    // get the current data from the sample
     float[] current = new float[s.getNumFrames()];
     s.read(current);
     
@@ -868,21 +872,8 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
     this.bounce = b;
   }
   
-/*  private void declickifyEnds()
+  void manualDeclickify()
   {
-    AudioUtils.declickifyEnds(sample);
-    sample.read(unprocessed);
-  }
-  */
-  void manualDeclickify()//PartialEnds()
-  {
-//    if (sample == null) return;
-
-    // create new data
-    //float[] tmp = new float[frames.length];
-    //System.arraycopy(frames, 0, tmp, 0, frames.length);
-    //float[] proc = 
-      
     AudioUtils.declickifyEnds(frames, scrubSlider.startFrame, scrubSlider.stopFrame);
 
     Sample lastSample = sample; // previous
@@ -894,12 +885,6 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
 
   Sample cloneSampleWith(float[] proc)
   {
-    // reset if float[] is a different size
-/*    if (proc.length != sample.getNumFrames()) {
-      unprocessed = new float[proc.length];
-      System.arraycopy(proc, 0, unprocessed, 0, proc.length);
-    }*/
-    
     // write the changed data to new sample
     Sample s = new Sample(proc.length);
     s.write(proc);
@@ -1001,7 +986,10 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
   {
     if (sample == null) return;
 
-    // restore orig data from 'unprocessed' TODO: fix bug here
+    // restore orig data from 'unprocessed' TODO: fix bug here #1
+    if (frames.length != unprocessed.length)
+    	frames = new float[unprocessed.length];
+    
     System.arraycopy(unprocessed, 0, frames, 0, frames.length);
     sample.write(frames);
     
@@ -1013,11 +1001,7 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
       scrubSlider.waveform = scrubSlider.unprocessedWaveform;
     }
 
-    // scrubSlider.waveform = null;
-
     sample.stop();
-    
-    // scrubSlider.waveform = scrubSlider.unprocessedWaveform;
   }
 
   private void load()
@@ -1134,10 +1118,6 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
   {
     return aggregateProb;
   }
-
-  public static final int W = 198, H = 150;
-  private static final float GAIN_SCALE = 2f;
-  private final int PIN_SLIDER_W = 140, PIN_SLIDER_H=12;
   
   public void toXml(Properties p, int bankIdx, int controlIdx)
   {
@@ -1265,5 +1245,10 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
       System.err.println("SampleScrubberfromXml() : " + e+"/"+e.getMessage());
     }
   }
+
+	int getSampleLength() {
+		return (sample != null) ? sample.getNumFrames() : 0;
+	}
+
 
 }// end

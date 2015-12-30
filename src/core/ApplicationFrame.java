@@ -32,10 +32,10 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
   static private PApplet p;
   static private UIManager uiMan;
   
-  static String[] sampleMenuNames = { OPEN, CUT, COPY, PASTE, REVERT, REVERSE, PAD, DECLICK };
+  static String[] sampleMenuNames = { OPEN, CUT, COPY, PASTE, REVERT, REVERSE, DOUBLE, DECLICK };
   static String[] sampleCbMenuNames = { SOLO, MUTE, SWEEP, BOUNCE, }; 
   static String[][] nestedMenus = {{ SHIFT, "-12", "-7", "-5", "-2", "  0", "  2", "  3", "  5", "  12", "  0" }};
-  static String[] bankMenuNames = { SOLO, MUTE, CLEAR, PAD, SWEEP, BOUNCE, REVERT, REVERSE, PAD, DECLICK };
+  static String[] bankMenuNames = { SOLO, MUTE, CLEAR, DOUBLE, SWEEP, BOUNCE, REVERT, REVERSE, DOUBLE, DECLICK };
   static ButtonGroup qGroup;
 
   public ApplicationFrame(PApplet sketch, int w, int h)
@@ -371,12 +371,6 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
   }
 
 	private void setShortcut(JMenuItem jmi, int keyEvent) {
-//		JMenuItem menuItemOpen = new JMenuItem("Open");
-//		menuItemOpen.setMnemonic(KeyEvent.VK_O);
-//		
-//		KeyStroke keyStrokeToOpen = KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK);
-//		menuItemOpen.setAccelerator(keyStrokeToOpen);
-		
 		if (!(jmi instanceof JMenu))
 			jmi.setAccelerator(KeyStroke.getKeyStroke(keyEvent, KeyEvent.META_DOWN_MASK));
 		jmi.setMnemonic(keyEvent);
@@ -387,7 +381,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     Object src = e.getSource();
     String cmd = e.getActionCommand();
     
-    System.out.println("ApplicationFrame.actionPerformed("+src.getClass().getName()+","+cmd+")");
+    //System.out.println("ApplicationFrame.actionPerformed("+src.getClass().getName()+","+cmd+")");
 
     // global-switch menu
     for (int i = 0; i < Switch.ACTIVE.length; i++)
@@ -452,7 +446,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
     {
       savePrefs();
     }
-    else if (src == openMI) // open a proj. config file
+    else if (src == openMI) // open proj config file
     {
       loadProject();
     } 
@@ -496,28 +490,24 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
 
   private void loadProject()
   {
-
     String s = System.getProperty("user.dir");
-    File def = new File(s +"/"+projDir);
-    System.out.println("ApplicationFrame.loadProject() :: "+def);
+    File def = new File(s + "/" + projDir);
 
     final JFileChooser fc = new JFileChooser();
+    fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     fc.setFileFilter(new ExampleFileFilter("xml"));
     fc.setCurrentDirectory(def);
+    
     int result = fc.showOpenDialog(p);
     if (result == JFileChooser.APPROVE_OPTION) {
-    	File xml = fc.getSelectedFile();
-    	if (xml != null) ((Pataclysm)p).fromXml(xml);
-
-      // user selects a file
+    	
+    	File chosen = fc.getSelectedFile();
+    	
+    	if (chosen.isDirectory()) // check for xml inside
+    		chosen = new File(chosen, chosen.getName()+".xml");
+    	
+    	if (chosen != null) ((Pataclysm)p).fromXml(chosen);
     }
-//    new Thread() {
-//      public void run() {
-//        fc.showOpenDialog(p);
-//        File xml = fc.getSelectedFile();
-//        if (xml != null) ((Pata4)p).fromXml(xml);
-//      }
-//    }.start();
   }
 
   public void about()

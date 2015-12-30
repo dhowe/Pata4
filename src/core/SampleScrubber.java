@@ -9,58 +9,50 @@ import processing.core.*;
 
 public class SampleScrubber implements SamplerConstants
 {
-  private static final int DEFAULT_SCRUB_W = 194, DEFAULT_SCRUB_H = 24;
+  private static final int W = 194, H = 24;
 
   PApplet p;
   SampleUIControl parent;
 
-  int x, y, w, h, stopFrame;
+  int x, y, w, h, stopFrame, sliderX, startFrame, waveformH;
+  
   private boolean visible = true, pressed;
   private int lastFrame;
-  int sliderX;
-  int startFrame, waveformH;
   private static Random rand = new Random();
   private float startX = 0, stopX = 0;
 
   private Rectangle bounds;
 
-  /* for testing only...
-  SampleScrubber(PApplet p, String sampleName, int xPos, int yPos, int w, int h) {
-    this(p, (SampleUIControl) null, xPos, yPos, w, h);
-    this.testSample = new Sample(sampleName);
-    this.stopFrame = testSample.getNumFrames();
-  }*/
-
-  public SampleScrubber(Pataclysm p, SampleUIControl svui, int xPos, int yPos) {
-    this(p, svui, xPos, yPos, DEFAULT_SCRUB_W, DEFAULT_SCRUB_H);
+  public SampleScrubber(PApplet p, SampleUIControl sc, int xPos, int yPos) {
+  	this(p, sc, xPos, yPos, W, H);
   }
+  
+  public SampleScrubber(PApplet p, int numFrames, int xPos, int yPos) { // only for testing
+  	init(checkPApplet(p), numFrames, xPos, yPos, W, H);
+  }
+ 
+  public SampleScrubber(PApplet p, SampleUIControl  sc, int x, int y, int w, int h) {
+  	
+  	this.parent = sc;
+  	this.init(p, sc.getSampleLength(), x, y, w, h);
+  }
+  
+  private void init(PApplet p, int stopFrame, int x, int y, int w, int h) {
 
-  private SampleScrubber
-    (PApplet p, SampleUIControl sc, int x, int y, int w, int h) {
-    // System.out.println("SampleSlider("+xPos+","+yPos+","+w+","+h+")");
-    this.parent = sc;
-    if (parent != null) {
-      this.p = p;
-      Sample s = getSample();
-      if (s != null)
-        this.stopFrame = s.getNumFrames();
-    }
+  	this.p = p;
     this.w = w;
     this.h = h;
     this.y = y;
     this.x = sliderX = x;
     this.waveformH = h+12;
     this.bounds = new Rectangle(x, y - h / 2, w, h);
+    this.stopFrame = stopFrame;
   }
 
-  public void draw(Sample s) 
-  {
-    //parent.refreshGain(s);
+  public void draw() 
+  {    
+    boolean partial = updateScrubPos();
     
-    updateScrubPos(s);
-    
-    boolean partial = isPartial(s);
-
     if (!visible) return;
 
     // setup pen --------------------------
@@ -70,19 +62,14 @@ public class SampleScrubber implements SamplerConstants
     p.rectMode(PConstants.CENTER);
 
     // horiz line -------------------------
-    //p.stroke(SamplerFi.BG[0], SamplerFi.BG[1], SamplerFi.BG[2]);
-    if (partial) {
-      p.stroke(WAVEFORM_COL);
-      p.line(x + startX, y, x + stopX, y); 
-    }
-    else {
-      p.stroke(WAVEFORM_COL);
-      p.line(x, y, x + w + 2, y);
-    }
-    
+    float x1 = partial ? x + startX : x;
+    float x2 = partial ? x + stopX : x + w + 2;
+    p.line(x1, y, x2, y);
+
     // waveform  ---------------------------
     if (waveform == null) 
-      computeWaveForm(s, w+4, waveformH);
+      computeWaveForm(getSample(), w+4, waveformH);
+    
     p.image(waveform, bounds.x, y - waveformH/2f);
     
     // red loop line -----------------------
@@ -100,21 +87,75 @@ public class SampleScrubber implements SamplerConstants
   
   public void computeWaveForm(Sample s, int w, int h) 
   {
-    //System.out.println("SampleScrubber."+parent.id+".computeWaveForm()");
+  	boolean partial = isPartial(s);
+    float[] pts = computePoints(s, w);
     
-    float[] pts = new float[w]; // 1 pt per pixel
-    boolean partial = isPartial(s);
-    int mod = s.getNumFrames() / w;
+    waveform = p.createGraphics(w, h, PApplet.JAVA2D);
+    float center = waveform.height/2f;
+    
+    waveform.beginDraw();
+    
+    waveform.noStroke();
+    waveform.fill(0,0);
+    waveform.rect(0,0, waveform.width-1, waveform.height-1);
+    
+    waveform.smooth();
+    waveform.noFill();
+    
+    for (int i = 0; i < pts.length-1; i++) {
+    	
+      float y1 = center+(pts[i] * h/2f);
+      float y2 = center+(pts[i+1] * h/2f);
+      
+      int alpha = (partial && (i < startX || i+1 > stopX)) ? 32 : 255;
+      
+      waveform.stroke(WAVEFORM_COL, alpha);
+      waveform.line(i, y1, i+1, y2);
+      
+      if (y1>center && y2>center) {
+        waveform.stroke(WAVEFORM_COL*.75f, alpha);
+        waveform.line(i, center+1, i, y1-1);
+      }
+      if (y1<center && y2<center) {
+        waveform.stroke(WAVEFORM_COL*.75f, alpha);
+        waveform.line(i, center-1, i, y1+1);
+      }
+    }
+
+    waveform.endDraw();
+    
+    if (unprocessedWaveform == null) {
+      try {
+        unprocessedWaveform = (PGraphics) waveform.clone();
+      }
+      catch (CloneNotSupportedException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+	private float[] computePoints(Sample s, int w) {
+		
+		float[] pts = new float[w]; // 1 pt per pixel
+    //int mod = s.getNumFrames() / w;
+		int mod = parent.frames.length / w;
     
     float max = 0;
     try
     {
+    	// find the max value
       for (int i = 0; i < pts.length; i++) {
-        float f = Math.abs(parent.frames[i * mod]);
+      	int idx = i * mod;
+      	if (idx >= parent.frames.length)
+      		System.err.println("ERROR:"+idx +">="+ parent.frames.length);
+        float f = Math.abs(parent.frames[idx]);
         if (f > max) max = f;
       }
-      for (int i = 0; i < pts.length; i++)
-        pts[i] = (parent.frames[i * mod] / max);
+      
+      for (int i = 0; i < pts.length; i++) {
+      	int idx = i * mod;
+        pts[i] = (parent.frames[idx] / max);
+      }
     }
     catch (Throwable e)
     {
@@ -123,50 +164,8 @@ public class SampleScrubber implements SamplerConstants
     
     pts[0] = pts[pts.length-1] = 0; // first and last
     
-    waveform = p.createGraphics(w, h, PApplet.JAVA2D);
-    float center = waveform.height/2f;
-    
-    waveform.beginDraw();
-    
-      waveform.noStroke();//255,0,0);
-      waveform.fill(0,0);
-      waveform.rect(0,0, waveform.width-1, waveform.height-1);
-      
-      waveform.smooth();
-      waveform.noFill();
-      
-      for (int i = 0; i < pts.length-1; i++) {
-        float y1 = center+(pts[i] * h/2f);
-        float y2 = center+(pts[i+1] * h/2f);
-        
-        int alpha = 255;
-
-        if (partial && (i < startX || i+1 > stopX))
-          alpha = 32;
-        
-        waveform.stroke(WAVEFORM_COL, alpha);
-        waveform.line(i, y1, i+1, y2);
-        
-        if (y1>center && y2>center) {
-          waveform.stroke(WAVEFORM_COL*.75f, alpha);
-          waveform.line(i, center+1, i, y1-1);
-        }
-        if (y1<center && y2<center) {
-          waveform.stroke(WAVEFORM_COL*.75f, alpha);
-          waveform.line(i, center-1, i, y1+1);
-        }
-      }
-
-    waveform.endDraw();
-    
-    if (unprocessedWaveform == null)
-      try {
-        unprocessedWaveform = (PGraphics) waveform.clone();
-      }
-      catch (CloneNotSupportedException e) {
-        e.printStackTrace();
-      }
-  }
+		return pts;
+	}
   
   PGraphics waveform, unprocessedWaveform;
 
@@ -193,8 +192,10 @@ public class SampleScrubber implements SamplerConstants
     return y + h;
   }
 
-  void updateScrubPos(Sample s) 
-  {
+  boolean updateScrubPos()  // return true if we have a partial loop, else false
+  {    
+  	Sample s = getSample();
+
     int cur = 0;
     float tot = Float.MAX_VALUE;
     try
@@ -206,21 +207,17 @@ public class SampleScrubber implements SamplerConstants
     {
       System.out.println("[WARN] (Caught) updateScrubPos-0: Error getting currentFrame!");
       System.out.println(Pataclysm.stackToString(e1));
-      return;
+      return false;
     }
     
-    sliderX = (int) PApplet.lerp(0, w, cur / (float) tot);
+    sliderX = (int) PApplet.lerp(0, w, cur / tot);
 
     if (!s.isPlaying())  // start looping if stopped
     {
       try
       {
         s.repeat(startFrame, stopFrame);
-        //System.out.println("SampleScrubber."+parent.id+".updateScrubPos().computeWaveForm");
-        
-        
-        // really?? every loop? try without this
-        computeWaveForm(s, w, waveformH);
+        computeWaveForm(s, w, waveformH); // recompute whenever we restart the loop? could be optimized...
       }
       catch (Exception e)
       {
@@ -247,7 +244,10 @@ public class SampleScrubber implements SamplerConstants
       if (parent.isBouncing()) 
         s.setPan(s.getPan() * -1f); 
     }
+    
     lastFrame = cur;
+    
+    return isPartial(s);
   }
 
   private void checkProbability(Sample s)
@@ -256,13 +256,9 @@ public class SampleScrubber implements SamplerConstants
     if (ap < 1) 
     {
       if (rand.nextFloat() > ap) 
-      {
         s.setVolume(0); // no trigger
-      }
       else if (!parent.muted) 
-      {
         parent.resetGainFromLastPos();
-      }
     }
   }
 
@@ -297,8 +293,8 @@ public class SampleScrubber implements SamplerConstants
     if (s == null) return;
     // System.out.println("start: "+startX+" stop: "+stopX);
     int len = s.getNumFrames();
-    startFrame = (int) ((startX / (float) w) * len);
-    stopFrame = (int) ((stopX / (float) w) * len);
+    startFrame = (int) ((startX / (float)w) * len); // spurious warning from eclipse, casts needed here
+    stopFrame = (int) ((stopX / (float)w) * len); // spurious warning from eclipse, casts needed here
     if (startFrame >= stopFrame)
       throw new RuntimeException("startFrame=" + startFrame + " >= stopFrame=" + stopFrame+ "!");
     if (s != null) getSample().stop();
@@ -426,5 +422,10 @@ public class SampleScrubber implements SamplerConstants
     fromXml(p, -1, -1);
     //System.out.println(p);
   }
-
+  
+  private static PApplet checkPApplet(PApplet pa) {
+  	if (pa instanceof Pataclysm)
+  		throw new RuntimeException("Unexpected state");
+  	return pa;
+	}
 }// end

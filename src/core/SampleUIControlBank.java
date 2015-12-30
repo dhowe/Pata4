@@ -330,9 +330,9 @@ public class SampleUIControlBank implements SamplerConstants, Actionable
       for (int i = 0; i < uiControls.length; i++)
         uiControls[i].manualDeclickify();
     }
-    else if (action.equals(PAD)) { 
+    else if (action.equals(DOUBLE)) { 
       for (int i = 0; i < uiControls.length; i++)
-        uiControls[i].doubleLength();
+        uiControls[i].doDoubleLength();
     }
     else if (action.startsWith(SHIFT)) {
       int shift = Integer.parseInt(action.split("=")[1]);

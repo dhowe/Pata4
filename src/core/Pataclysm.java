@@ -19,9 +19,10 @@ import procontroll.ControllDevice;
 
 /*
  * NEW
+ *  Probability-disable-button
  *  Tap-tempo
  *  Undo-last
- *  Automate
+ *  Automate slider
  * 	Check modified jar/src:Sample.instances
  * 
  * TODO: 
@@ -88,10 +89,10 @@ import procontroll.ControllDevice;
  *    Add dynamic quantize based on 1st sample?  
  */
 public class Pataclysm extends PApplet implements SamplerConstants {
-	
+
 	static final boolean IGNORE_PREFS = true, EXITING = false;
 	static final String PROJECT_TO_LOAD = "proj/DandelionMessenger";
-	static final boolean LOAD_CONFIG_FILE = false, LOAD_SAMPLE_DIR = false;
+	static final boolean LOAD_CONFIG_FILE = true, LOAD_SAMPLE_DIR = false;
 	static final int SAMPLE_RATE = AudioUtils.SAMPLE_RATE;
 	static final String SAMPLE_DIR = "/Users/dhowe/Documents/Workspaces/eclipse-workspace/LiveSampler/";
 
@@ -104,9 +105,10 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	static float microProb = DEFAULT_MICRO_PROB;
 
 	static String cpu = "";
-	static int timestamp = -100000, masterControlsY = 0, currentControlBankIdx = 0;
+	static int timestamp = -100000, masterControlsY = 0,
+			currentControlBankIdx = 0;
 	static float bg[] = new float[3], masterGain = 0, masterProb = 1;
-	
+
 	static boolean isExiting;
 	static private boolean saving = false;
 
@@ -139,7 +141,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	}
 
 	private void loadPrefs() {
-		
+
 		quantizeMode = (DEFAULT_QUANTIZE_MODE);
 		microDataSize = (DEFAULT_MICRO_DATA_SIZE);
 		microPadSize = (DEFAULT_MICRO_PAD_SIZE);
@@ -148,7 +150,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		Preferences prefs = getPrefs();
 
 		if (!IGNORE_PREFS) {
-			
+
 			setQuantizeMode(prefs.get(QUANTIZE_MODE, ADDITIVE));
 			microDataSize = prefs.getInt(MICRO_DATA, DEFAULT_MICRO_DATA_SIZE);
 			microPadSize = prefs.getInt(MICRO_PAD, DEFAULT_MICRO_PAD_SIZE);
@@ -158,7 +160,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 					+ " micro-data=" + microDataSize + " micro-pad=" + microPadSize
 					+ " micro-prob=" + microProb);
 		} else {
-			
+
 			try {
 				prefs.flush();
 				System.out.println("[INFO] Flushing preferences...");
@@ -216,7 +218,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 
 		// update every 5 sec
 		if (millis() - timestamp > 5000) {
-			cpu = "CPU: " + AudioUtils.getCpuPercentage();//+"  Samples: "+Sample.instances.size();
+			cpu = "CPU: " + AudioUtils.getCpuPercentage();// +"  Samples: "+Sample.instances.size();
 			timestamp = millis();
 		}
 
@@ -261,11 +263,11 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 			footswitch = new USBFootSwitch(0);
 			footswitch.setup(this, dev);
 		} catch (Throwable e) {
-			System.out.println("[WARN] Unable to initialize FootSwitch");
+			System.out.println("[WARN] No FootSwitch found...");
 		}
 	}
 
-	private void drawSwitches() {
+	private void drawSwitches() { // not used presently
 		// if (!SHOW_UI) return;
 
 		rectMode(PConstants.CORNER);
@@ -674,33 +676,33 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 
 	public void fromXml(File f) {
 
-System.out.println("Pata4.fromXml() :: "+f);
+		// System.out.println("Pataclysm.fromXml() :: "+f);
 
 		Properties p = new Properties();
-		
+
 		try {
 			p.loadFromXML(new FileInputStream(f));
 			System.out.println("[INFO] Loaded: " + f + "\n       ("
 					+ p.getProperty("data.dir") + ")");
-		
+
 		} catch (Exception e) {
-			
+
 			System.err.println("[WARN] No config file found: " + f);
 			return;
 		}
-		
+
 		try {
 			gain.setValue(Integer.parseInt(p.getProperty("master.volume")));
 		} catch (NumberFormatException e1) {
 			gain.setValue((int) (INITIAL_MASTER_VOL * 100));
 		}
-		
+
 		try {
 			prob.setValue(Integer.parseInt(p.getProperty("master.prob")));
 		} catch (NumberFormatException e) {
 			prob.setValue(100);
 		}
-		
+
 		Switch.SNIP.set(getBool(p, "master.snip"));
 		for (int i = 0; i < controlBanks.length; i++)
 			controlBanks[i].fromXml(p, i);
@@ -762,7 +764,7 @@ System.out.println("Pata4.fromXml() :: "+f);
 		// System.out.println("setQuantizeMode("+mode+")");
 
 		quantizeMode = NO_QUANTIZE;
-		
+
 		if (mode.equals(ADDITIVE))
 			quantizeMode = ADDITIVE_QUANTIZE;
 		else if (mode.equals(SUBTRACTIVE))
@@ -781,7 +783,7 @@ System.out.println("Pata4.fromXml() :: "+f);
 			SampleUIControl[] uiControls) {
 		System.err.println("Pataclysm.mixDown() :: not implemented!");
 	}
-	
+
 	public static void main(String[] args) {
 		// MyGUIButton.SHOW_BUTTON_ARROW = true;
 		SwingUtilities.invokeLater(new Runnable() {

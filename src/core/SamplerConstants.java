@@ -13,12 +13,12 @@ public interface SamplerConstants
   String VERSION = "v011";
   String METER_IMG_12 = "meter125x12.png";
   String PROJ_DIR = "proj", DATA_DIR = "src/data/";
-  String PAD = "Double", SOLO = "Solo", BOUNCE="Bounce", MIX_DOWN="MixDown", REVERSE="Reverse";
-  String DTREM = "dTrem", REVERT = "Revert", DECLICK = "Declickify", CLEAR="Clear", SHIFT="Shift"; 
-  String COPY = "Copy", PASTE= "Paste", CUT = "Cut", SEP="-";
-  String OPEN = "Open...", MUTE = "Mute", SWEEP="Sweep";
+  String DOUBLE = "Double", SOLO = "Solo", BOUNCE = "Bounce", MIX_DOWN = "MixDown", REVERSE = "Reverse";
+  String DTREM = "dTrem", REVERT = "Revert", DECLICK = "Declickify", CLEAR = "Clear", SHIFT = "Shift"; 
+  String COPY = "Copy", PASTE= "Paste", CUT = "Cut", SEP = "-";
+  String OPEN = "Open...", MUTE = "Mute", SWEEP = "Sweep";
   String FONT = "LucidaSans-Typewriter-48.vlw";
-  String ADDITIVE = "Grow", SUBTRACTIVE="Shrink", MICRO="Micro", NONE="None";
+  String ADDITIVE = "Grow", SUBTRACTIVE = "Shrink", MICRO = "Micro", NONE = "None";
   String[] QUANTIZE_MODES = { ADDITIVE, SUBTRACTIVE, MICRO, NONE };
   
   // PREF-KEYS
