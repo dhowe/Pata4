@@ -10,7 +10,7 @@ import procontroll.ControllIO;
 public class Joystick
 {
   int id;
-  Pataclysm app;
+  PApplet app;
   
   public Joystick(int i)
   {

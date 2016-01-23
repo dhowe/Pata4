@@ -80,9 +80,9 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
 
   public void draw()
   {
+  	p.rectMode(PApplet.CORNER);
+  	
     int x = bounds.x, y = bounds.y;
-
-    p.rectMode(PApplet.CORNER);
 
     // colored rect
     p.noStroke();
@@ -428,11 +428,6 @@ public class SampleUIControl implements SamplerConstants, LerpListener, Actionab
   void resetGainFromLastPos()
   {
     mapToSlider(GAIN_SLIDER, lastSliderGainPos);
-  }
-
-  private float getGain()
-  { // 0 - 1;
-    return sample.getVolume();
   }
 
   private void setPropertyWithSliderType(SliderType type, int raw)

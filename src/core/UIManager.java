@@ -2,6 +2,7 @@ package core;
 
 import java.awt.event.*;
 
+import javafx.scene.control.Toggle;
 import mkv.MyGUI.*;
 import processing.core.PFont;
 import processing.core.PImage;
@@ -19,14 +20,16 @@ public class UIManager implements SamplerConstants, ActionListener
   Pataclysm app;
   SampleUIControlBank[] banks;
 
-  public UIManager(Pataclysm p)
+  @SuppressWarnings("static-access")
+	public UIManager(Pataclysm p)
   {
     this.app = p;
 
     p.smooth();
+    
     font = p.loadFont(FONT);
     p.textFont(font, 32);
-     
+         
     meterImg = p.loadImage(METER_IMG_12); 
 
     gui = new MyGUI(p, 260);
@@ -44,7 +47,7 @@ public class UIManager implements SamplerConstants, ActionListener
     gui.add(p.gain);
     gui.add(p.gainLabel);
 
-    p.probLabel = new MyGUILabel(p, "PROB", p.gain._x + 108, Pataclysm.masterControlsY);
+    p.probLabel = new MyGUILabel(p, "", p.gain._x + 108, Pataclysm.masterControlsY);
     p.prob = new GUIPinSlider(p, p.probLabel._x + 110, p.probLabel._y, 140, 12, 0, 100);
     p.prob.setValue(100);
     gui.add(p.prob);
@@ -71,17 +74,17 @@ public class UIManager implements SamplerConstants, ActionListener
     
     SampleUIControlBank bank = app.currentControlBank();
     SampleUIControl control = app.currentControl();
-
-    if (keyCode == 27)  // what should this do?
-    {  
-      // escape key  ???????????
-      control.revert(true);
-      control.resetSample();
-      return;
-    }
-    else if (keyCode == 127)
+//
+//    if (keyCode == 27)  // what should this do?
+//    {  
+//      // reset sample
+//      control.revert(true);
+//      control.resetSample();
+//      return;
+//    } else 
+    if (keyCode == 27) // escape to delete
     { 
-      // forward-delete key
+      // 127=forward-delete key
       control.delete();
       return;
     }
@@ -234,17 +237,33 @@ public class UIManager implements SamplerConstants, ActionListener
 
   public void mouseReleased()
   {
-    if (banks == null)
-      return;
-
-    for (int k = 0; k < banks.length; k++)
+  	if (Switch.DISABLE_PROB.contains(app.mouseX, app.mouseY)) {
+    	
+  		Switch.DISABLE_PROB.toggle();   
+    	
+    	if (Switch.DISABLE_PROB.on) { // trigger each sample
+    		
+        for (int k = 0; banks != null && k < banks.length; k++)
+        {
+          if (banks[k] == null) continue;
+          SampleUIControl[] controls = banks[k].uiControls;
+          for (int i = 0; i < controls.length; i++)
+          {
+          	if (!controls[i].muted)
+          		controls[i].resetGainFromLastPos();
+          }
+        }
+    	}
+    	
+    	return;
+  	}
+    
+    for (int k = 0; banks != null && k < banks.length; k++)
     {
-      if (banks[k] == null)
-        continue;
+      if (banks[k] == null) continue;
       SampleUIControl[] controls = banks[k].uiControls;
       for (int i = 0; i < controls.length; i++)
       {
-        /* if (controls[i].isPressed()) */
         if (controls[i].contains(app.mouseX, app.mouseY))
           controls[i].mouseReleased(app.mouseEvent);
       }

@@ -251,7 +251,7 @@ public class SampleScrubber implements SamplerConstants
 
   private void checkProbability(Sample s)
   {
-    float ap = parent.getAggregateProb();
+    float ap = Switch.DISABLE_PROB.on ? 1 : parent.getAggregateProb();
     if (ap < 1) 
     {
       if (rand.nextFloat() > ap) 

@@ -4,9 +4,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
-
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 public final class Switch implements SamplerConstants
 {
@@ -14,6 +13,7 @@ public final class Switch implements SamplerConstants
   
   public static final Switch SNIP  		= new Switch("Snip-Mode", false, KeyEvent.VK_D);
   public static final Switch SHOW_UI 	= new Switch("VisibleUI", true);
+  public static final Switch DISABLE_PROB = new Switch("PROB", true);
   
   // public static final Switch MUTE  = new Switch("Mute", false);
 
@@ -73,19 +73,37 @@ public final class Switch implements SamplerConstants
     return bounds.contains(mx, my);
   }
 
+  public void draw(PApplet p, int x, int y) {
+  	if (this.bounds == null)
+  		this.setPosition(x, y);
+  	else { 
+  		bounds.x = x;
+  		bounds.y = y;
+  	}
+  	this.draw(p);
+  }
+  	
   public void draw(PApplet p) {
-    if (bounds.width<0) 
-      bounds.width = (int)p.textWidth(name)+(RECT_PAD*2);
-    if (bounds.height<0) 
-      bounds.height = (int)p.textAscent()+(RECT_PAD*2);
+		
+  	p.rectMode(PConstants.CORNER);
+    p.textAlign(PConstants.CENTER);
+  	
+    p.textFont(Pataclysm.uiMan.font, 10);
+    if (bounds.width < 0) {
+      bounds.width = (int)(p.textWidth(name)+RECT_PAD*2);
+      bounds.height = (int)(p.textAscent()+RECT_PAD*2);
+    }
+    
     p.noFill();
     p.rect(bounds.x, bounds.y, bounds.width, bounds.height);
-    p.fill(on ? Pataclysm.TEXT_FILL : 200);
+    
     if (on)
       p.fill(200, 100, 100);
     else
       p.fill(Pataclysm.TEXT_FILL);
-    p.text(name, bounds.x+RECT_PAD, bounds.y+12);
+    
+
+    p.text(name, bounds.x + bounds.width/2f, bounds.y+bounds.height-p.textDescent());
   }
   
 }// end

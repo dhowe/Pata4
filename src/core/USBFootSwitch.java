@@ -26,22 +26,25 @@ public class USBFootSwitch extends Joystick
   
   public static ControllDevice getDevice(PApplet p)
   {
-  	ControllDevice[] devs = Joystick.getDevices(p,"DELCOM JS Foot Switch");
-  	ControllDevice fs = devs[0];
-  	//System.out.println(fs);
-  	return fs;
+  	ControllDevice[] devs = null;
+		try {
+			devs = Joystick.getDevices(p, "DELCOM JS Foot Switch");
+		} catch (Throwable e) {
+			
+			e.printStackTrace();
+		}
+  	return (devs != null && devs.length > 0) ? devs[0] : null;
   }
   
-  public void setup(Pataclysm p, ControllDevice device)
+  public void setup(PApplet p, ControllDevice device)
   {
     this.app = p;   
     this.device = device;
-    System.out.print("[INFO] USBFootSwitch: ");
-    if (device!= null) {
-        System.out.println(device.getName()+": "+id);    
+    if (device != null) {
+    	System.out.println("[INFO] USBFootSwitch: "+device.getName()+": "+id);    
     }
     else 
-    	System.out.println("[INFO] USBFootSwitch not found...");  
+    	throw new RuntimeException("Unable to load footswitch");
 
     registerMethods();
   }
@@ -57,16 +60,24 @@ public class USBFootSwitch extends Joystick
   }
   
   public void onButton0Press() {
-  	//System.out.println("USBFootSwitch.onButton0Press()");
-    if (!app.recording())
-      app.recordStart();
+  	
+  	if (app instanceof Pataclysm) {
+  		Pataclysm pata = (Pataclysm) app;
+  		if (!pata.recording())
+  			pata.recordStart();
+  	}
+  	else
+  		System.out.println("USBFootSwitch.onButton0Press()");
   }
   
   public void onButton0Release() {
-  	//System.out.println("USBFootSwitch.onButton0Release()");
-    if (app.recording()) {
-      app.recordStop();
-    }
+  	if (app instanceof Pataclysm) {
+  		Pataclysm pata = (Pataclysm) app;
+  		if (pata.recording())
+  			pata.recordStop();
+  	}
+  	else
+  		System.out.println("USBFootSwitch.onButton0Press()");
   }
 
 

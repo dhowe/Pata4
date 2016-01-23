@@ -84,8 +84,9 @@ public class SampleUIControlBank implements SamplerConstants, Actionable
       app.text("[muted]", clickBounds.x+106,clickBounds.y+70);
     }
   
-    // rectangle for the bank
     app.rectMode(PApplet.CORNER);
+
+    // rectangle for the bank
     app.noFill();
     if (volumeControl.getValue()==0)
       app.fill(0, 127);

@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="data"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="jsyn_16_7_3.jar"/>
-	<classpathentry kind="lib" path="procontroll.jar"/>
 	<classpathentry kind="lib" path="jportaudio.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Pataclysm"/>
@@ -12,6 +11,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="core1.2.jar"/>
 	<classpathentry kind="lib" path="MyGuiMod.jar"/>
+	<classpathentry kind="lib" path="pcontrol.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sonia"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

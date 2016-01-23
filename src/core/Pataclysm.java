@@ -16,77 +16,6 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import procontroll.ControllDevice;
 
-/*
- * NEW
- *  Probability-disable-button
- *  Tap-tempo
- *  Undo-last
- *  Automate slider
- * 	Check modified jar/src:Sample.instances
- * 
- * TODO: 
- *     -- re-add declick() as needed (always work from 'unprocessed')
- *     -- test mixDown
- *     -- add: setQuantsizeFromLength in q-menu
- *    
- *   BUGS:
- *     -- cut/paste keys are busted :(
- *     -- trem deletes startX, stopX
- *     -- trem restarts sample (instead of continuing it) 
- *     -- changing pitch ignores startX, stopX frames!
- *     -- copy-paste ignores shift (and delete)  
- *   
- *   NEXT:
- *      Remove pitch-shift, restore shift
- *      Add micro pitch-shift function
- *      Add switch for pitch-shift vs. sample rate
- *      Add menus w' state (boolean & pitchShift)
- *   
- *      show/check: micro-quantize times/prob
- *      add footswitch
- term should not unset partials
- ----
- *      Try removing extra computeWaveForm() call    
- *      Micro: variable capture-length?  
- *      Micro: make smart-sync of sliderX positions **
- * 
- *  NEW FEATURES:
- *    No-Attack mode
- *    Transpose-bank/transpose-all down 1-step, up a -3rd? up a 4th?
- *    Trem all
- *    
- *    **  declickify w' start/end-frames has to fadeIn/fadeOut otherwise it is adding clicks... ??? 
- *    **  add smart-quantize-mode (ignores levels close to zero on ends) ? or make all modes 'smart'
- *     
- *    Global Output Level Meter?
- *    
- *    PREFS:  quantize-size, quantize-mode, quantize-multiple, default-prob
- *    
- *    Add to sample: declickify-entire?
- *    Add to Global: trigger-all-on-next button, declickify-all controls
- *    
- *    Add partials to menu/sub-menu?
- *    quantize loops on select-partial w' mouse?
- *    enable dragging of (red) selected loop line
- *    
- *    Do multi-select 
- *    Do Mix-Down
- *    
- *    Fix CPU problem (profile!)
- *       Remove transparency of Ui-Controls?
- *    
- *    BUGS:
- *      after double(), revert (unprocessed) is also doubled (bug or feature?)
- *      'cut' is broken? yes, need to clone control?
- *      Deal with Sonia/JSyn bugs!
- *    
- *    ---------------------------------
- *    MENUS:
- *      Make open-dialog select folder-name when you click
- *      Add Save-as, and refigure save
- *          
- *    Add dynamic quantize based on 1st sample?  
- */
 public class Pataclysm extends PApplet implements SamplerConstants {
 
 	static final boolean IGNORE_PREFS = true, EXITING = false;
@@ -104,8 +33,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	static float microProb = DEFAULT_MICRO_PROB;
 
 	static String cpu = "";
-	static int timestamp = -100000, masterControlsY = 0,
-			currentControlBankIdx = 0;
+	static int timestamp = -100000, masterControlsY = 0, currentControlBankIdx = 0;
 	static float bg[] = new float[3], masterGain = 0, masterProb = 1;
 
 	static boolean isExiting;
@@ -119,8 +47,10 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	static UIManager uiMan;
 	static Preferences prefs;
 
-	static SliderType[] currentSliderTypes = { RATE_SLIDER, TREM_SLIDER,
-			PROB_SLIDER, GAIN_SLIDER, };
+	static SliderType[] currentSliderTypes = {
+		RATE_SLIDER, TREM_SLIDER,
+		PROB_SLIDER, GAIN_SLIDER, 
+  };
 
 	public void setup() {
 		size(1280, 768);
@@ -138,7 +68,31 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		for (int i = 0; i < controlBanks.length; i++)
 			controlBanks[i].refreshControls();
 	}
+	
+	public void draw() {
+		
+		background(Pataclysm.bg[0], Pataclysm.bg[1], Pataclysm.bg[2]);
 
+		setVisible(Switch.SHOW_UI.on==true);
+
+		strokeWeight(1);
+
+		//drawSwitches();
+
+		if (saving) {
+			fill(200, 100, 100);
+			text("[saving]", width - 60, 15);
+		}
+
+		if (Switch.SHOW_UI.on)
+			drawControlBanks();
+
+		if (recording())
+			drawOnRecord();
+
+		drawMasterControls();
+	}
+	
 	private void loadPrefs() {
 
 		quantizeMode = (DEFAULT_QUANTIZE_MODE);
@@ -169,29 +123,6 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		}
 	}
 
-	public void draw() {
-		background(Pataclysm.bg[0], Pataclysm.bg[1], Pataclysm.bg[2]);
-
-		setVisible(Switch.SHOW_UI.on);
-
-		strokeWeight(1);
-
-		// drawSwitches();
-
-		if (saving) {
-			fill(200, 100, 100);
-			text("[saving]", width - 60, 15);
-		}
-
-		if (Switch.SHOW_UI.on)
-			drawControlBanks();
-
-		if (recording())
-			drawOnRecord();
-
-		drawMasterControls();
-	}
-
 	public void setVisible(boolean b) {
 		gain._visible = b;
 		prob._visible = b;
@@ -204,27 +135,29 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	}
 
 	private void drawMasterControls() {
-		if (!Switch.SHOW_UI.on)
-			return;
+		
+		if (!Switch.SHOW_UI.on) return;
 
+		rectMode(PConstants.CORNER);
+		
 		noFill();
 		strokeWeight(2);
 		stroke(BG_R, BG_G, BG_B, 63);
-		rectMode(PConstants.CORNER);
-
+		
 		int rectW = (NUM_BANKS * UI_BANK_SPACING) - NUM_BANKS * 3;
 		rect(controlBanks[0].x - 3, masterControlsY - 18, rectW, 38);
 
-		// update every 5 sec
-		if (millis() - timestamp > 5000) {
+		// update every .5 sec
+		if (millis() - timestamp > 500) {
 			cpu = "CPU: " + AudioUtils.getCpuPercentage();// +"  Samples: "+Sample.instances.size();
 			timestamp = millis();
 		}
 
 		// AudioUtils.inputMeterVertical(this, width-70, height-57, 30, 400);
-		AudioUtils.drawInputMeter(this, controlBanks[2].x + 40, height - 30, 300,
-				20);
+		AudioUtils.drawInputMeter(this, controlBanks[2].x + 40, height - 30, 300, 20);
 
+		Switch.DISABLE_PROB.draw(this, probLabel._x-4, probLabel._y-7);
+		
 		fill(255);
 
 		text("IN:", controlBanks[2].x + 10, masterControlsY + 5);
@@ -233,8 +166,8 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		if (quantizeMode == MICRO_QUANTIZE)
 			fill(200, 0, 0);
 
-		text(getQuantizeMode(), controlBanks[NUM_BANKS - 1].x + 40,
-				masterControlsY + 5);
+		text(getQuantizeMode(), controlBanks[NUM_BANKS - 1].x + 40, masterControlsY + 5);
+		
 		fill(255);
 		text(cpu, controlBanks[NUM_BANKS - 1].x + 134, masterControlsY + 5);
 
@@ -440,12 +373,15 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	}
 
 	void drawOnRecord() {
+		
+		rectMode(PConstants.CENTER);
+		
 		// recording circle
 		fill(220);
-		rectMode(PConstants.CENTER);
 		rect(width - 20, 20, 30, 30);
 		fill(255, 55, 55);
 		ellipse(width - 20, 20, 30, 30);
+		
 		/*
 		 * 
 		 * float curr = recordBuffer.update(); stroke(220); rect(width - 20, height

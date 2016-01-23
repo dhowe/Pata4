@@ -1,7 +1,5 @@
 package core;
 
-import java.util.*;
-
 import pitaru.sonia.LiveInput;
 import pitaru.sonia.Sample;
 
@@ -12,23 +10,13 @@ public class RecordBuffer implements SamplerConstants
   private Sample sample;
   private Sample buffer;
   private boolean recording;
-  private List levels;
 
   public RecordBuffer()
   {
-    this.levels = new ArrayList();
-  }
-
-  public float update()
-  {
-    float lev = LiveInput.getLevel();
-    levels.add(lev);
-    return lev;
   }
 
   public void startRecord()
   {
-    this.levels.clear();
     this.recording = true;
     this.buffer = new Sample(Pataclysm.SAMPLE_RATE * MAX_SAMPLE_LEN);
     LiveInput.startRec(buffer);
@@ -192,24 +180,6 @@ public class RecordBuffer implements SamplerConstants
     float[] data = new float[(endClipIdx - startClipIdx)+(Pataclysm.microPadSize)];
     System.arraycopy(frames, startClipIdx, data, Pataclysm.microPadSize/2, data.length-Pataclysm.microPadSize);
     return quantizeSampleData(data, minQuantum);
-  }
-
-  private int getMaxLevelIdx(List l)
-  {
-    int idx = 0;
-    float max = -1;
-    int maxIdx = -1;
-    for (Iterator i = l.iterator(); i.hasNext(); idx++)
-    {
-      Float f = (Float) i.next();
-      float level = f.floatValue();
-      if (level > max)
-      {
-        max = level;
-        maxIdx = idx;
-      }
-    }
-    return maxIdx;
   }
 
   public boolean isRecording()
