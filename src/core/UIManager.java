@@ -2,7 +2,6 @@ package core;
 
 import java.awt.event.*;
 
-import javafx.scene.control.Toggle;
 import mkv.MyGUI.*;
 import processing.core.PFont;
 import processing.core.PImage;
@@ -325,7 +324,7 @@ public class UIManager implements SamplerConstants, ActionListener
   {
     Object source = e.getSource();
 
-    // System.out.println("UIManager.actionPerformed("+source+")");
+    //System.out.println("UIManager.actionPerformed("+source+")");
 
     // check the global sliders
     if (source == Pataclysm.gain)

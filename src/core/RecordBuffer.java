@@ -1,7 +1,6 @@
 package core;
 
-import pitaru.sonia.LiveInput;
-import pitaru.sonia.Sample;
+import pitaru.sonia.*;
 
 public class RecordBuffer implements SamplerConstants
 {
@@ -10,10 +9,6 @@ public class RecordBuffer implements SamplerConstants
   private Sample sample;
   private Sample buffer;
   private boolean recording;
-
-  public RecordBuffer()
-  {
-  }
 
   public void startRecord()
   {

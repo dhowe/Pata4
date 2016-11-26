@@ -161,6 +161,8 @@ public class AudioUtils
     
     boolean dbug = false;
 
+    if (frames == null) return new float[0];
+    
     // check we have enough room for the fade
     if (numFadeSamples > (frames.length/3f)) {
       System.out.println("[WARN] Short sample in declickEnd(len="+frames.length+")");

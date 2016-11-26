@@ -16,14 +16,21 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import procontroll.ControllDevice;
 
+/*
+ * 
+ * Check key-mapping (cmd-c, cmd-v)
+ * Implement 'undo'
+ */
 public class Pataclysm extends PApplet implements SamplerConstants {
 
+	static int INPUT_DEVICE_ID = 5, OUTPUT_DEVICE_ID = 9;
+	
 	static final boolean IGNORE_PREFS = true, EXITING = false;
-	static final String PROJECT_TO_LOAD = "proj/DandelionMessenger";
+	static final String PROJECT_TO_LOAD = "proj/Test1Nov8";
 	static final boolean LOAD_CONFIG_FILE = true, LOAD_SAMPLE_DIR = false;
 	static final int SAMPLE_RATE = AudioUtils.SAMPLE_RATE;
-	static final String SAMPLE_DIR = "/Users/dhowe/Documents/Workspaces/eclipse-workspace/LiveSampler/";
-
+	static final String SAMPLE_DIR = "/Users/dhowe/Documents/Workspaces/eclipse-workspace/Pataclysm/";
+	
 	// PREFS
 	static int quantizeMult = DEFAULT_QUANTIZE_MULT;
 	static int quantizeMode = ADDITIVE_QUANTIZE;
@@ -33,7 +40,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	static float microProb = DEFAULT_MICRO_PROB;
 
 	static String cpu = "";
-	static int timestamp = -100000, masterControlsY = 0, currentControlBankIdx = 0;
+	static int timestamp = -Integer.MAX_VALUE, masterControlsY = 0, currentControlBankIdx = 0;
 	static float bg[] = new float[3], masterGain = 0, masterProb = 1;
 
 	static boolean isExiting;
@@ -165,7 +172,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 
 		if (quantizeMode == MICRO_QUANTIZE)
 			fill(200, 0, 0);
-
+		//System.out.println("MODE:"+getQuantizeMode());
 		text(getQuantizeMode(), controlBanks[NUM_BANKS - 1].x + 40, masterControlsY + 5);
 		
 		fill(255);

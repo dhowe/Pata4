@@ -194,13 +194,16 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
 
   void startSonia(PApplet p)
   {
+		Sonia.setInputDevice(Pataclysm.INPUT_DEVICE_ID);
+		Sonia.setOutputDevice(Pataclysm.OUTPUT_DEVICE_ID);
+		
     Sonia.start(p);
     LiveInput.start(SPECTRUM_LENGTH);
     LiveInput.useEqualizer(false);
   }
 
   // Generic registration with the Mac OS X application menu
-  public void registerForMacOSXEvents()
+	public void registerForMacOSXEvents()
   {
     if (OSX) {
       try {
