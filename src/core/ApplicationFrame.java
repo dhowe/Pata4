@@ -40,7 +40,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
 
   public ApplicationFrame(PApplet sketch, int w, int h)
   {
-    System.setProperty("apple.laf.useScreenMenuBar", "true");
+  	if (OSX) System.setProperty("apple.laf.useScreenMenuBar", "true");
     
     p = sketch;
     

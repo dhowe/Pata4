@@ -9,9 +9,11 @@ import java.util.prefs.Preferences;
 
 import javax.swing.SwingUtilities;
 
+import com.jsyn.JSyn;
+
 import mkv.MyGUI.MyGUILabel;
 import mkv.MyGUI.MyGUIPinSlider;
-import pitaru.sonia.Sample;
+import pitaru.sonia.*;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import procontroll.ControllDevice;
@@ -27,7 +29,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	
 	static final boolean IGNORE_PREFS = true, EXITING = false;
 	static final String PROJECT_TO_LOAD = "proj/Test1Nov8";
-	static final boolean LOAD_CONFIG_FILE = false, LOAD_SAMPLE_DIR = false;
+	static final boolean LOAD_CONFIG_FILE = true, LOAD_SAMPLE_DIR = false;
 	static final int SAMPLE_RATE = AudioUtils.SAMPLE_RATE;
 	static final String SAMPLE_DIR = "/Users/dhowe/Documents/Workspaces/eclipse-workspace/Pataclysm/";
 	
@@ -107,6 +109,10 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		microPadSize = (DEFAULT_MICRO_PAD_SIZE);
 		microProb = (DEFAULT_MICRO_PROB);
 
+		System.out.println("[INFO] Java.Version: " + System.getProperty("java.version"));
+		System.out.println("[INFO] Sonia.Version: " + Sonia.VERSION);
+		System.out.println("[INFO] JSyn.Version: " + JSyn.VERSION);
+				
 		Preferences prefs = getPrefs();
 
 		if (!IGNORE_PREFS) {
