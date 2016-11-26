@@ -23,11 +23,11 @@ import procontroll.ControllDevice;
  */
 public class Pataclysm extends PApplet implements SamplerConstants {
 
-	static int INPUT_DEVICE_ID = 5, OUTPUT_DEVICE_ID = 9;
+	static int INPUT_DEVICE_ID = 5, OUTPUT_DEVICE_ID = 2;
 	
 	static final boolean IGNORE_PREFS = true, EXITING = false;
 	static final String PROJECT_TO_LOAD = "proj/Test1Nov8";
-	static final boolean LOAD_CONFIG_FILE = true, LOAD_SAMPLE_DIR = false;
+	static final boolean LOAD_CONFIG_FILE = false, LOAD_SAMPLE_DIR = false;
 	static final int SAMPLE_RATE = AudioUtils.SAMPLE_RATE;
 	static final String SAMPLE_DIR = "/Users/dhowe/Documents/Workspaces/eclipse-workspace/Pataclysm/";
 	
