@@ -10,7 +10,7 @@ public interface SamplerConstants
   boolean SHOW_BANK_MENU = true; 
   boolean USE_JPOPUP_MENUS = true;
   
-  String VERSION = "v011";
+  String VERSION = "v012";
   String METER_IMG_12 = "meter125x12.png";
   String PROJ_DIR = "proj", DATA_DIR = "src/data/";
   String DOUBLE = "Double", SOLO = "Solo", BOUNCE = "Bounce", MIX_DOWN = "MixDown", REVERSE = "Reverse";

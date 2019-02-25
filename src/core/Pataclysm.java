@@ -19,20 +19,22 @@ import processing.core.PConstants;
 import procontroll.ControllDevice;
 
 /*
+ * SETUP: Launch Amplitube with Soundflower(2ch) as output, Audio HiJack (should hear sound), then Pata
  * 
  * Check key-mapping (cmd-c, cmd-v)
  * Implement 'undo'
  */
 public class Pataclysm extends PApplet implements SamplerConstants {
 
-	static int INPUT_DEVICE_ID = 5, OUTPUT_DEVICE_ID = 2;
-	
+	static int INPUT_DEVICE_ID = 3, OUTPUT_DEVICE_ID = 4;
+
+	static final boolean LOAD_SAMPLE_DIR = false;
+	static final String PROJECT_TO_LOAD = "nylon/NylonTest";
+	static final String SAMPLE_DIR = "samples/";
+
 	static final boolean IGNORE_PREFS = true, EXITING = false;
-	static final String PROJECT_TO_LOAD = "proj/Test1Nov8";
-	static final boolean LOAD_CONFIG_FILE = true, LOAD_SAMPLE_DIR = false;
 	static final int SAMPLE_RATE = AudioUtils.SAMPLE_RATE;
-	static final String SAMPLE_DIR = "/Users/dhowe/Documents/Workspaces/eclipse-workspace/Pataclysm/";
-	
+
 	// PREFS
 	static int quantizeMult = DEFAULT_QUANTIZE_MULT;
 	static int quantizeMode = ADDITIVE_QUANTIZE;
@@ -56,10 +58,11 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	static UIManager uiMan;
 	static Preferences prefs;
 
-	static SliderType[] currentSliderTypes = {
-		RATE_SLIDER, TREM_SLIDER,
-		PROB_SLIDER, GAIN_SLIDER, 
-  };
+	static SliderType[] currentSliderTypes = { RATE_SLIDER, TREM_SLIDER, PROB_SLIDER, GAIN_SLIDER, };
+
+	public void settings() {
+		size(1280, 768);
+	}
 
 	public void setup() {
 		size(1280, 768);
@@ -77,16 +80,16 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		for (int i = 0; i < controlBanks.length; i++)
 			controlBanks[i].refreshControls();
 	}
-	
+
 	public void draw() {
-		
+
 		background(Pataclysm.bg[0], Pataclysm.bg[1], Pataclysm.bg[2]);
 
-		setVisible(Switch.SHOW_UI.on==true);
+		setVisible(Switch.SHOW_UI.on == true);
 
 		strokeWeight(1);
 
-		//drawSwitches();
+		// drawSwitches();
 
 		if (saving) {
 			fill(200, 100, 100);
@@ -101,7 +104,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 
 		drawMasterControls();
 	}
-	
+
 	private void loadPrefs() {
 
 		quantizeMode = (DEFAULT_QUANTIZE_MODE);
@@ -112,7 +115,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		System.out.println("[INFO] Java.Version: " + System.getProperty("java.version"));
 		System.out.println("[INFO] Sonia.Version: " + Sonia.VERSION);
 		System.out.println("[INFO] JSyn.Version: " + JSyn.VERSION);
-				
+
 		Preferences prefs = getPrefs();
 
 		if (!IGNORE_PREFS) {
@@ -122,9 +125,8 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 			microPadSize = prefs.getInt(MICRO_PAD, DEFAULT_MICRO_PAD_SIZE);
 			microProb = prefs.getFloat(MICRO_PROB, DEFAULT_MICRO_PROB);
 
-			System.out.println("[INFO] Loading prefs: " + " quantize=" + quantizeMode
-					+ " micro-data=" + microDataSize + " micro-pad=" + microPadSize
-					+ " micro-prob=" + microProb);
+			System.out.println("[INFO] Loading prefs: " + " quantize=" + quantizeMode + " micro-data=" + microDataSize
+					+ " micro-pad=" + microPadSize + " micro-prob=" + microProb);
 		} else {
 
 			try {
@@ -148,29 +150,31 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	}
 
 	private void drawMasterControls() {
-		
-		if (!Switch.SHOW_UI.on) return;
+
+		if (!Switch.SHOW_UI.on)
+			return;
 
 		rectMode(PConstants.CORNER);
-		
+
 		noFill();
 		strokeWeight(2);
 		stroke(BG_R, BG_G, BG_B, 63);
-		
+
 		int rectW = (NUM_BANKS * UI_BANK_SPACING) - NUM_BANKS * 3;
 		rect(controlBanks[0].x - 3, masterControlsY - 18, rectW, 38);
 
 		// update every .5 sec
 		if (millis() - timestamp > 500) {
-			cpu = "CPU: " + AudioUtils.getCpuPercentage();// +"  Samples: "+Sample.instances.size();
+			cpu = "CPU: " + AudioUtils.getCpuPercentage();// +" Samples:
+															// "+Sample.instances.size();
 			timestamp = millis();
 		}
 
 		// AudioUtils.inputMeterVertical(this, width-70, height-57, 30, 400);
 		AudioUtils.drawInputMeter(this, controlBanks[2].x + 40, height - 30, 300, 20);
 
-		Switch.DISABLE_PROB.draw(this, probLabel._x-4, probLabel._y-7);
-		
+		Switch.DISABLE_PROB.draw(this, probLabel._x - 4, probLabel._y - 7);
+
 		fill(255);
 
 		text("IN:", controlBanks[2].x + 10, masterControlsY + 5);
@@ -178,9 +182,9 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 
 		if (quantizeMode == MICRO_QUANTIZE)
 			fill(200, 0, 0);
-		//System.out.println("MODE:"+getQuantizeMode());
+		// System.out.println("MODE:"+getQuantizeMode());
 		text(getQuantizeMode(), controlBanks[NUM_BANKS - 1].x + 40, masterControlsY + 5);
-		
+
 		fill(255);
 		text(cpu, controlBanks[NUM_BANKS - 1].x + 134, masterControlsY + 5);
 
@@ -234,7 +238,8 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	}
 
 	int incrControlBank() {
-		// System.err.print("LiveTextMix.incrControlSet()  oldIdx="+currentControlBankIdx);
+		// System.err.print("LiveTextMix.incrControlSet()
+		// oldIdx="+currentControlBankIdx);
 		if (++currentControlBankIdx == controlBanks.length)
 			currentControlBankIdx = 0;
 		updateBankView();
@@ -242,7 +247,8 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	}
 
 	int decrControlBank() {
-		// System.out.println("LiveTextMix.decrControlSet() oldIdx="+currentControlBankIdx);
+		// System.out.println("LiveTextMix.decrControlSet()
+		// oldIdx="+currentControlBankIdx);
 		if (--currentControlBankIdx < 0)
 			currentControlBankIdx = controlBanks.length - 1;
 		updateBankView();
@@ -302,8 +308,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 			if (srcs[i].getSample() != null)
 				srcList.add(srcs[i]);
 		}
-		SampleUIControl[] src = (SampleUIControl[]) srcList
-				.toArray(new SampleUIControl[srcList.size()]);
+		SampleUIControl[] src = (SampleUIControl[]) srcList.toArray(new SampleUIControl[srcList.size()]);
 
 		Sample[] rawSamples = new Sample[src.length];
 		for (int i = 0; i < src.length; i++) {
@@ -376,7 +381,8 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	}
 
 	public static SampleUIControlBank currentControlBank() {
-		// System.out.println("LiveTextMix.currentControlBank(): "+currentControlBankIdx);
+		// System.out.println("LiveTextMix.currentControlBank():
+		// "+currentControlBankIdx);
 		return controlBanks[currentControlBankIdx];
 	}
 
@@ -386,20 +392,20 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	}
 
 	void drawOnRecord() {
-		
+
 		rectMode(PConstants.CENTER);
-		
+
 		// recording circle
 		fill(220);
 		rect(width - 20, 20, 30, 30);
 		fill(255, 55, 55);
 		ellipse(width - 20, 20, 30, 30);
-		
+
 		/*
 		 * 
-		 * float curr = recordBuffer.update(); stroke(220); rect(width - 20, height
-		 * - 20, 30, 60); fill(255, 55, 55); rect(width - 20, height - 20, 30, curr
-		 * * (height - 40)); rectMode(PConstants.CORNER);
+		 * float curr = recordBuffer.update(); stroke(220); rect(width - 20,
+		 * height - 20, 30, 60); fill(255, 55, 55); rect(width - 20, height -
+		 * 20, 30, curr * (height - 40)); rectMode(PConstants.CORNER);
 		 */
 		// drawLiveSample(this, recordBuffer.levels, true, 50, width/2,
 		// height/2, LIVE_SAMPLE_Z_OFFSET);
@@ -428,9 +434,10 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 			if (controlBanks[k] != null)
 				controlBanks[k].refreshControls();
 			/*
-			 * continue; SampleUIControl[] voiceControls = controlBanks[k].uiControls;
-			 * for (int i = 0; i < voiceControls.length; i++) { if (voiceControls[i]
-			 * != null) voiceControls[i].refresh(!voiceControls[i].isMuted()); //
+			 * continue; SampleUIControl[] voiceControls =
+			 * controlBanks[k].uiControls; for (int i = 0; i <
+			 * voiceControls.length; i++) { if (voiceControls[i] != null)
+			 * voiceControls[i].refresh(!voiceControls[i].isMuted()); //
 			 * voiceControls[i].mapToSlider(PROB, //
 			 * voiceControls[i].sliders[PROB].getValue()); }
 			 */
@@ -462,7 +469,8 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 				if (i != currentControlBankIdx) {
 					// System.out.println(i+") ControlSets.enabled=false");
 					controlBanks[i].selected = false;
-					// controlBanks[i].setVisible(true);// Switch.SHOW_ALL_CONTROLS.on);
+					// controlBanks[i].setVisible(true);//
+					// Switch.SHOW_ALL_CONTROLS.on);
 				}
 			}
 		}
@@ -503,8 +511,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 	}
 
 	public void saveToXml(final File projDir) {
-		System.out.println("[INFO] " + getClass().getName() + ".saveToXml(projDir="
-				+ projDir + ")");// "+parentDir+")");
+		System.out.println("[INFO] " + getClass().getName() + ".saveToXml(projDir=" + projDir + ")");// "+parentDir+")");
 		new Thread() {
 			public void run() {
 				try {
@@ -516,19 +523,16 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 					if (!projDir.exists()) // copy first...
 					{
 						if (!projDir.mkdirs())
-							throw new RuntimeException("Unable to create proj dir: "
-									+ projDir);
+							throw new RuntimeException("Unable to create proj dir: " + projDir);
 					}
-					System.out.println("\n[INFO] Created directory: "
-							+ projDir.getAbsolutePath());
+					System.out.println("\n[INFO] Created directory: " + projDir.getAbsolutePath());
 
 					Properties p = toXml(projDir);
 					p = sortProperties(p);
 					File config = new File(projDir, projDir.getName() + ".xml");
 					p.storeToXML(new FileOutputStream(config), new Date() + "");
 
-					System.out.println("\n[INFO] Saved xml properties to: "
-							+ config.getAbsolutePath());
+					System.out.println("\n[INFO] Saved xml properties to: " + config.getAbsolutePath());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -542,8 +546,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		List list = new LinkedList(p.entrySet());
 		Collections.sort(list, new Comparator() {
 			public int compare(Object o1, Object o2) {
-				return ((Comparable) ((Map.Entry) (o1)).getValue())
-						.compareTo(((Map.Entry) (o2)).getValue());
+				return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
 			}
 		});
 		Properties result = new Properties();
@@ -560,33 +563,31 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 				return;
 			loadSamplesFromDir(sampleDir);
 			return;
-		} else if (LOAD_CONFIG_FILE) {
+		} else if (PROJECT_TO_LOAD != null) {
 			String home = System.getProperty("user.dir");
-			int idx = PROJECT_TO_LOAD.lastIndexOf('/');
 			String projName = PROJECT_TO_LOAD;
-			if (idx > -1)
+			int idx = PROJECT_TO_LOAD.lastIndexOf('/');
+			if (idx > -1) {
 				projName = PROJECT_TO_LOAD.substring(idx + 1);
-			File xml = new File(home + "/" + PROJECT_TO_LOAD + "/" + projName
-					+ ".xml");
+			}
+			File xml = new File(home + "/" + PROJECT_TO_LOAD + "/" + projName + ".xml");
 			// System.out.println("Trying: "+xml+" proj="+projName);
 			fromXml(xml);
 		}
 	}
 
-	private void loadSamplesFromDir(String directory) { 
-		
+	private void loadSamplesFromDir(String directory) {
+
 		File dir = new File(directory);
 		if (!dir.exists())
-			throw new RuntimeException("No sampleDir(" + directory + ") found in: "
-					+ System.getProperty("user.dir"));
+			throw new RuntimeException("No sampleDir(" + directory + ") found in: " + System.getProperty("user.dir"));
 
 		// System.out.println(Arrays.asList(dir.listFiles()));
 
 		FileFilter ff = new FileFilter() {
 			public boolean accept(File pathname) {
 				System.out.println("trying " + pathname.getName());
-				return pathname.toString().endsWith(".wav")
-						|| pathname.toString().endsWith(".aiff")
+				return pathname.toString().endsWith(".wav") || pathname.toString().endsWith(".aiff")
 						|| pathname.toString().endsWith(".aif");
 			}
 		};
@@ -597,12 +598,10 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		Collections.shuffle(l);
 		samps = (File[]) l.toArray(new File[l.size()]);
 
-		System.out.println("[INFO] Loading " + samps.length + " samples from: "
-				+ directory);
+		System.out.println("[INFO] Loading " + samps.length + " samples from: " + directory);
 
 		for (int i = 0; i < Math.min(samps.length, MAX_NUM_TO_PRELOAD); i++) {
-			SampleUIControl sc = controlBanks[currentControlBankIdx]
-					.selectedControl();
+			SampleUIControl sc = controlBanks[currentControlBankIdx].selectedControl();
 
 			sc.setSample(samps[i].getPath(), true, false);
 			sc.setGain(.4f); // lower volume for default samples
@@ -619,8 +618,8 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 
 		try {
 			p.loadFromXML(new FileInputStream(f));
-			System.out.println("[INFO] Loaded: " + f); 
-			//+ "\n       ("+ p.getProperty("data.dir") + ")");
+			System.out.println("[INFO] Loaded: " + f);
+			// + "\n ("+ p.getProperty("data.dir") + ")");
 
 		} catch (Exception e) {
 
@@ -716,8 +715,7 @@ public class Pataclysm extends PApplet implements SamplerConstants {
 		return prefs;
 	}
 
-	public void mixDown(SampleUIControl sampleUIControl,
-			SampleUIControl[] uiControls) {
+	public void mixDown(SampleUIControl sampleUIControl, SampleUIControl[] uiControls) {
 		System.err.println("Pataclysm.mixDown() :: not implemented!");
 	}
 

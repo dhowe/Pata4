@@ -197,9 +197,27 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
 		Sonia.setInputDevice(Pataclysm.INPUT_DEVICE_ID);
 		Sonia.setOutputDevice(Pataclysm.OUTPUT_DEVICE_ID);
 		
-    Sonia.start(p);
-    LiveInput.start(SPECTRUM_LENGTH);
-    LiveInput.useEqualizer(false);
+    try {
+			Sonia.start(p);
+		}
+		catch (Exception e) {
+			System.err.println("0) Failed to open inputs: "+e);
+			System.exit(0);
+		}
+    try {
+			LiveInput.start(SPECTRUM_LENGTH);
+		}
+		catch (Exception e) {
+			System.err.println("1) Failed to open inputs: "+e);
+			System.exit(0);
+		}
+    try {
+			LiveInput.useEqualizer(false);
+		}
+		catch (Exception e) {
+			System.err.println("2) Failed to open inputs: "+e);
+			System.exit(0);
+		}
   }
 
   // Generic registration with the Mac OS X application menu
@@ -226,7 +244,7 @@ public class ApplicationFrame extends JFrame implements SamplerConstants, Action
   {
     JDialog ab = new JDialog(this, "About");
     ab.getContentPane().setLayout(new BorderLayout());
-    ab.getContentPane().add(new JLabel("SamplerFi["+VERSION+"]", JLabel.CENTER));
+    ab.getContentPane().add(new JLabel("Pataclysm["+VERSION+"]", JLabel.CENTER));
     ab.getContentPane().add(new JLabel("\u00A920010 Daniel Howe", JLabel.CENTER), BorderLayout.SOUTH);
     ab.setSize(160, 120);
     ab.setResizable(false);

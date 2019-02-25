@@ -108,7 +108,7 @@ public class AudioUtils
    */
   private static float[] declickStart(float[] frames, int numFadeSamples, int startFrame)
   {
-    if (startFrame > frames.length) 
+    if (frames == null || startFrame > frames.length) 
       throw new RuntimeException("Invalid startFrames: "+startFrame);
     
     boolean dbug = false;

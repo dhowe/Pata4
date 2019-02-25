@@ -2,13 +2,13 @@
 <classpath>
 	<classpathentry excluding="pitaru/sonia/|pitaru/|core/test/" kind="src" path="src"/>
 	<classpathentry kind="src" path="data"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/core1.2.jar"/>
 	<classpathentry kind="lib" path="lib/jportaudio.jar"/>
 	<classpathentry kind="lib" path="lib/jsyn_16_7_3.jar"/>
 	<classpathentry kind="lib" path="lib/MyGuiMod.jar" sourcepath="lib/MyGuiMod-src.jar"/>
 	<classpathentry kind="lib" path="lib/pcontrol.jar"/>
 	<classpathentry kind="lib" path="lib/procontroll.jar"/>
-	<classpathentry kind="lib" path="lib/sonia.jar"/>
+	<classpathentry kind="lib" path="lib/core1.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sonia"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,0 +1,22 @@
+<project name="Pataclysm" default="export" basedir=".">
+
+	<!-- ===================== properties ===================== -->
+
+	<property file="resources/build.properties" />
+
+	<target name="export">
+		
+		<jar destfile="tmp/app.jar" basedir="bin"/>
+		
+		<jarbundler dir="/Users/dhowe/Desktop/" name="Pataclysm" jvmversion="1.8" mainclass="core.Pataclysm">
+			<jarfileset dir="lib">
+				<include name="**/*.jar" />
+			</jarfileset>
+			<jarfileset dir="tmp">
+				<include name="**/*.jar" />
+			</jarfileset>
+		</jarbundler>
+		
+	</target>
+
+</project>
